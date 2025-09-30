@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: tournament_db
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://username:password@postgres:5432/tournament_db?schema=public"
+      JWT_SECRET: "your-super-secret-jwt-key"
+      NODE_ENV: "development"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data
