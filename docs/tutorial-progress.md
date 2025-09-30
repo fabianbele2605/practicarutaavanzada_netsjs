@@ -1,106 +1,184 @@
 # Tutorial: Plataforma de Gestión de Torneos - Progreso Paso a Paso
 
+## 📊 Estado General del Proyecto
+
+**Fecha de última actualización:** 2024-12-19
+**Rama actual:** `feature/authentication`
+**Progreso total:** ~65% de la Fase 2 completada
+
+---
+
 ## 📋 Fase 1: Preparación y Configuración del Entorno ✅ COMPLETADA
 
-### ✅ Completado
+### ✅ Logros completados:
 
-#### Paso 1: Inicialización del proyecto NestJS
-```bash
-cd /home/Coder/Documentos/GitHub/PracticaRutaAvanzada_NetsJS/backend
-npx @nestjs/cli new . --package-manager npm
-```
+#### 🚀 Inicialización del proyecto
+- ✅ Proyecto NestJS con TypeScript configurado
+- ✅ Estructura de carpetas profesional
+- ✅ Scripts de desarrollo configurados
 
-#### Paso 2: Configuración de herramientas de desarrollo
-```bash
-npm install @nestjs/config
-npm install -D husky lint-staged
-npx husky init
-```
+#### 🛠️ Herramientas de desarrollo
+- ✅ ESLint y Prettier configurados
+- ✅ Husky para pre-commit hooks
+- ✅ lint-staged para código limpio
+- ✅ Variables de entorno con ConfigModule
 
-#### Paso 3: Configuración de Prisma
-```bash
-npm install prisma @prisma/client
-npx prisma init
-npx prisma validate
-npx prisma generate
-```
+#### 🗄️ Base de datos y ORM
+- ✅ Prisma ORM instalado y configurado
+- ✅ Esquema completo con 5 modelos:
+  - `User` (con roles y autenticación)
+  - `Tournament` (gestión de torneos)
+  - `Team` (equipos por torneo)
+  - `Player` (jugadores por equipo)
+  - `Match` (partidos con resultados)
+- ✅ Enums para estados y roles
+- ✅ Relaciones complejas entre modelos
 
-#### Paso 4: Configuración de Docker
-- ✅ Dockerfile creado
-- ✅ .dockerignore configurado  
+#### 🐳 Containerización
+- ✅ Dockerfile para backend
 - ✅ docker-compose.yml con PostgreSQL
+- ✅ .dockerignore configurado
 
-#### Paso 5: Esquema de base de datos completo
-- ✅ Modelo User con roles
-- ✅ Modelo Tournament con estados
-- ✅ Modelo Team con relaciones
-- ✅ Modelo Player
-- ✅ Modelo Match con equipos locales/visitantes
-- ✅ Enums para estados
-
-### 🎯 Conceptos Aprendidos:
-- Estructura de proyectos NestJS
-- Configuración de variables de entorno
-- Sintaxis de Prisma Schema y relaciones
-- Docker para desarrollo
-- Herramientas de linting y formateo
+### 📚 Conceptos dominados:
+- Arquitectura modular de NestJS
+- Diseño de esquemas relacionales con Prisma
+- Configuración de entorno de desarrollo profesional
+- Containerización con Docker
 
 ---
 
-## 📋 Fase 2: Autenticación y Usuarios 🔄 EN PROGRESO
+## 📋 Fase 2: Autenticación y Usuarios 🔄 EN PROGRESO (65%)
 
-### Objetivo
-Implementar un sistema seguro de usuarios con autenticación JWT y roles.
+### 🎯 Objetivo
+Sistema completo de autenticación con JWT, roles y seguridad.
 
-### ✅ Completado:
-- ✅ Instalar dependencias de autenticación
-- ✅ Crear módulos (users, auth, prisma)
-- ✅ Crear DTOs de validación (CreateUserDto, LoginDto)
-- ✅ Implementar PrismaService
-- ✅ Implementar UsersService con bcrypt
-- ✅ Implementar AuthService con JWT
-- ✅ Configurar UsersModule
+### ✅ Completado hasta ahora:
 
-### 🔄 Pendiente:
-- [ ] Crear estrategia JWT (jwt.strategy.ts)
-- [ ] Configurar AuthModule con JWT
-- [ ] Crear guards de autenticación
-- [ ] Implementar controladores
-- [ ] Crear endpoints de registro y login
-- [ ] Probar autenticación
+#### 📦 Dependencias y módulos
+- ✅ Dependencias de autenticación instaladas:
+  - `@nestjs/passport`, `@nestjs/jwt`
+  - `passport-jwt`, `bcryptjs`
+  - `class-validator`, `class-transformer`
+- ✅ Módulos generados: `users`, `auth`, `prisma`
+- ✅ Estructura de carpetas organizada
 
-### Progreso detallado:
+#### 🔒 DTOs y validación
+- ✅ `CreateUserDto` con validaciones completas:
+  - Email único y válido
+  - Contraseña mínima de 6 caracteres
+  - Roles opcionales con enum
+- ✅ `LoginDto` para autenticación
+- ✅ Validaciones automáticas con decoradores
 
-#### Paso 1: ✅ Dependencias instaladas
-```bash
-npm install @nestjs/passport @nestjs/jwt passport passport-jwt bcryptjs class-validator class-transformer
-npm install -D @types/passport-jwt @types/bcryptjs
+#### ⚙️ Servicios implementados
+- ✅ **PrismaService**: Conexión automática a BD
+- ✅ **UsersService**: 
+  - Creación de usuarios con hash de contraseñas
+  - Búsqueda por email e ID
+  - Manejo de duplicados
+  - Exclusión de contraseñas en respuestas
+- ✅ **AuthService**:
+  - Registro de nuevos usuarios
+  - Login con validación de credenciales
+  - Generación de tokens JWT
+  - Validación de usuarios por ID
+
+#### 🏗️ Configuración de módulos
+- ✅ `UsersModule` configurado con exports
+- ✅ Inyección de dependencias correcta
+
+### 🔄 Próximos pasos (para continuar en casa):
+
+#### Paso 8: JWT Strategy
+```typescript
+// src/auth/jwt.strategy.ts
+// Estrategia de Passport para validar tokens JWT
 ```
 
-#### Paso 2: ✅ Módulos creados
-```bash
-npx nest generate module users
-npx nest generate service users  
-npx nest generate controller users
-npx nest generate module auth
-npx nest generate service auth
-npx nest generate controller auth
-npx nest generate service prisma
+#### Paso 9: AuthModule completo
+```typescript
+// Configurar módulo con JWT, Passport y estrategias
 ```
 
-#### Paso 3: ✅ DTOs implementados
-- `src/users/dto/create-user.dto.ts` - Validación para crear usuarios
-- `src/auth/dto/login.dto.ts` - Validación para login
+#### Paso 10: Guards de autenticación
+```typescript
+// Guards para proteger rutas
+// Decoradores personalizados para roles
+```
 
-#### Paso 4: ✅ Servicios implementados
-- `PrismaService` - Conexión a base de datos
-- `UsersService` - CRUD de usuarios con bcrypt
-- `AuthService` - Login y registro con JWT
+#### Paso 11: Controladores
+```typescript
+// Endpoints REST para registro y login
+// Documentación con Swagger
+```
 
-#### Próximo paso al continuar:
-**Crear `src/auth/jwt.strategy.ts` para validación de tokens JWT**
+#### Paso 12: Testing
+```bash
+# Pruebas de autenticación
+# Validación de endpoints
+```
+
+### 🎓 Conceptos que dominarás:
+- Autenticación JWT en NestJS
+- Estrategias de Passport
+- Guards y decoradores personalizados
+- Encriptación de contraseñas
+- Manejo seguro de tokens
+- Validación de datos con DTOs
 
 ---
 
-**Rama actual:** `feature/authentication`
-**Estado:** Servicios principales implementados - Continuar con JWT Strategy
+## 🚀 Comandos para continuar en casa:
+
+```bash
+# Clonar o actualizar repositorio
+git clone [tu-repositorio]
+# o
+git pull origin feature/authentication
+
+# Instalar dependencias
+cd backend
+npm install
+
+# Verificar que todo funciona
+npm run lint
+npm run build
+
+# Continuar desarrollo
+# Crear src/auth/jwt.strategy.ts
+```
+
+---
+
+## 📈 Progreso por fases:
+
+- **Fase 1 (Setup):** ✅ 100% Completada
+- **Fase 2 (Auth):** 🔄 65% Completada
+- **Fase 3 (Modules):** ⏳ Pendiente
+- **Fase 4 (Testing):** ⏳ Pendiente
+- **Fase 5 (Deploy):** ⏳ Pendiente
+
+---
+
+## 📝 Archivos clave implementados:
+
+### Servicios principales:
+- `src/prisma/prisma.service.ts` - Conexión a base de datos
+- `src/users/users.service.ts` - CRUD de usuarios con bcrypt
+- `src/auth/auth.service.ts` - Autenticación JWT
+
+### DTOs de validación:
+- `src/users/dto/create-user.dto.ts` - Validación de registro
+- `src/auth/dto/login.dto.ts` - Validación de login
+
+### Configuración:
+- `prisma/schema.prisma` - Esquema completo de BD
+- `src/users/users.module.ts` - Módulo de usuarios
+- `.env` - Variables de entorno
+- `docker-compose.yml` - Servicios containerizados
+
+---
+
+**💡 Nota importante:** Todo el código está guardado en la rama `feature/authentication`. La organización de ramas se optimizará cuando tengamos más funcionalidades completas.
+
+**🎯 Meta inmediata:** Completar JWT Strategy y AuthModule para tener autenticación funcional.
