@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: tournament_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: tournament_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tournament_network
+
+  backend:
+    build: ./backend
+    container_name: tournament_backend
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:password@postgres:5432/tournament_db?schema=public"
+      JWT_SECRET: "mi_clave_secreta_super_segura_para_jwt_2024"
+      PORT: 3000
+    depends_on:
+      - postgres
+    networks:
+      - tournament_network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
+
+networks:
+  tournament_network:
+    driver: bridge
