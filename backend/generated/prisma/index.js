@@ -198,7 +198,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/Coder/Documentos/GitHub/PracticaRutaAvanzada_NetsJS/backend/generated/prisma",
+      "value": "/home/fabian/PracticaRutaAvanzada_NetsJS/backend/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -212,7 +212,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/Coder/Documentos/GitHub/PracticaRutaAvanzada_NetsJS/backend/prisma/schema.prisma",
+    "sourceFilePath": "/home/fabian/PracticaRutaAvanzada_NetsJS/backend/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -226,7 +226,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": true,
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

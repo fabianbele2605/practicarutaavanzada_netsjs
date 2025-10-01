@@ -8,6 +8,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { TournamentsModule } from './tournaments/tournaments.module';
 import { TeamsModule } from './teams/teams.module';
 import { PlayersModule } from './players/players.module';
+import { MatchesModule } from './matches/matches.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { PlayersModule } from './players/players.module';
     AuthModule,
     TournamentsModule,
     TeamsModule,
-    PlayersModule
+    PlayersModule,
+    MatchesModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
