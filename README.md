@@ -1,113 +1,295 @@
 # PracticaRutaAvanzada_NetsJS
 Práctica sobre lo aprendido de la ruta NestJS y TypeScript - Riwi
 
-## 🚀 Features Implementados
+## 🚀 **Sistema de Gestión de Torneos**
 
-### ✅ Users Module
-Módulo base de gestión de usuarios con:
+Sistema completo de gestión de torneos deportivos desarrollado con **NestJS**, **TypeScript**, **Prisma** y **PostgreSQL**. Incluye autenticación JWT, autorización por roles y CRUD completo para todas las entidades.
 
-- **Modelo y CRUD de usuarios**: Operaciones completas
-- **Sistema de roles**: USER y ADMIN
-- **Autenticación**: Registro y login
-- **Validaciones**: Email único y campos requeridos
+## 📋 **Módulos Implementados**
 
-#### Endpoints:
-- `POST /users` - Crear usuario
-- `GET /users` - Listar usuarios con filtros
-- `GET /users/:id` - Obtener usuario específico
-- `PATCH /users/:id` - Actualizar usuario
-- `DELETE /users/:id` - Eliminar usuario
+### ✅ **Users Module**
+Gestión completa de usuarios del sistema.
+- **Funcionalidades**: CRUD de usuarios, encriptación de contraseñas, sistema de roles
+- **Roles**: USER, ADMIN
+- **Endpoints**: `/users` (GET, POST, PATCH, DELETE)
+- **Seguridad**: Contraseñas encriptadas con bcrypt
 
-### ✅ Auth Module
-Módulo de autenticación y autorización con:
+### ✅ **Auth Module**
+Sistema de autenticación y autorización.
+- **Funcionalidades**: Login, registro, JWT tokens, guards de seguridad
+- **Endpoints**: `/auth/login`, `/auth/register`, `/auth/profile`
+- **Seguridad**: JWT Strategy, Guards (JwtAuthGuard, RolesGuard), decoradores @Roles
 
-- **JWT Authentication**: Tokens seguros
-- **Guards y Strategies**: Protección de rutas
-- **Role-based Access**: Control por roles
-- **Password Hashing**: Encriptación con bcrypt
+### ✅ **Tournaments Module**
+Gestión de torneos deportivos.
+- **Funcionalidades**: CRUD de torneos, validaciones de fechas, relación con organizadores
+- **Endpoints**: `/tournaments` (GET, POST, PATCH, DELETE)
+- **Validaciones**: Fechas válidas, límites de equipos, estados del torneo
 
-#### Endpoints:
-- `POST /auth/register` - Registro de usuario
-- `POST /auth/login` - Inicio de sesión
-- `GET /auth/profile` - Perfil del usuario autenticado
+### ✅ **Teams Module**
+Gestión de equipos participantes.
+- **Funcionalidades**: CRUD de equipos, relación con torneos, validaciones de límites
+- **Endpoints**: `/teams` (GET, POST, PATCH, DELETE)
+- **Validaciones**: Límite máximo por torneo, nombres únicos por torneo
 
-### ✅ Tournaments Module (feature/tournaments-module)
-Módulo completo de gestión de torneos con:
+### ✅ **Players Module**
+Gestión de jugadores de los equipos.
+- **Funcionalidades**: CRUD de jugadores, relación con equipos, filtros avanzados
+- **Endpoints**: `/players` (GET, POST, PATCH, DELETE)
+- **Características**: Filtros por nombre, posición, equipo, paginación
 
-- **Modelo y CRUD de torneos**: Operaciones completas
-- **Relación con usuarios**: Campo organizador vinculado a User
-- **Validación de estados y fechas**: Reglas de negocio implementadas
-- **Testeo completo**: Tests unitarios y de integración
+### ✅ **Matches Module**
+Gestión de partidos entre equipos.
+- **Funcionalidades**: CRUD de partidos, gestión de resultados, estados de partidos
+- **Endpoints**: `/matches` (GET, POST, PATCH, DELETE)
+- **Validaciones**: Equipos del mismo torneo, no pueden jugar contra sí mismos
 
-#### Endpoints:
-- `POST /tournaments` - Crear torneo (Solo ADMIN)
-- `GET /tournaments` - Listar torneos con filtros y paginación
-- `GET /tournaments/:id` - Obtener torneo específico
-- `PATCH /tournaments/:id` - Actualizar torneo (Solo ADMIN)
-- `DELETE /tournaments/:id` - Eliminar torneo (Solo ADMIN)
+## 🏗️ **Arquitectura del Sistema**
 
-#### Validaciones de negocio:
-- ✅ Fecha inicio < fecha fin
-- ✅ No crear torneos en el pasado
-- ✅ Mínimo 2 equipos por torneo
-- ✅ Estados válidos (UPCOMING, ACTIVE, FINISHED)
-
-### ✅ Teams Module (feature/teams-module)
-Módulo completo de gestión de equipos con:
-
-- **Modelo y CRUD de equipos**: Operaciones completas vinculadas a torneos
-- **Relación con torneos**: Verificación de existencia y límites
-- **Asociación con jugadores**: Consultas incluidas y validaciones
-- **Validaciones de negocio**: Límites por torneo, nombres únicos
-
-#### Endpoints:
-- `POST /teams` - Crear equipo en torneo específico (Solo ADMIN)
-- `GET /teams` - Listar equipos con filtros y paginación
-- `GET /teams/:id` - Obtener equipo específico con jugadores
-- `PATCH /teams/:id` - Actualizar equipo (Solo ADMIN)
-- `DELETE /teams/:id` - Eliminar equipo (Solo ADMIN)
-
-#### Validaciones de negocio:
-- ✅ Verificar que el torneo existe antes de crear equipo
-- ✅ Respetar límite máximo de equipos por torneo (maxTeams)
-- ✅ No permitir nombres duplicados en el mismo torneo
-- ✅ No eliminar equipos que tengan jugadores asociados
-- ✅ Búsqueda case-insensitive por nombre
-
-### ✅ Players Module (feature/players-module)
-Módulo completo de gestión de jugadores con:
-
-- **Modelo y CRUD de jugadores**: Operaciones completas vinculadas a equipos
-- **Filtros avanzados**: Búsqueda por nombre, posición y equipo
-- **Paginación completa**: Con metadatos y límites configurables
-- **Validaciones robustas**: Campos requeridos y opcionales
-
-#### Endpoints:
-- `POST /players` - Crear jugador
-- `GET /players` - Listar jugadores con filtros y paginación
-- `GET /players/:id` - Obtener jugador específico
-- `PATCH /players/:id` - Actualizar jugador
-- `DELETE /players/:id` - Eliminar jugador
-
-#### Filtros disponibles:
-- ✅ Búsqueda por nombre (case-insensitive)
-- ✅ Filtro por posición del jugador
-- ✅ Filtro por equipo específico (teamId)
-- ✅ Paginación con page y limit (1-100)
-- ✅ Respuesta con metadatos (total, totalPages)
-
-## 🛠️ Tecnologías
-
+### **Tecnologías Principales:**
 - **Backend**: NestJS + TypeScript
-- **Base de datos**: Prisma ORM + PostgreSQL
-- **Autenticación**: JWT + bcryptjs
+- **Base de datos**: PostgreSQL + Prisma ORM
+- **Autenticación**: JWT + Passport
 - **Validación**: class-validator + class-transformer
 - **Testing**: Jest
 - **Containerización**: Docker
 
-## 🚀 Instalación
+### **Patrones Implementados:**
+- **Módulos**: Arquitectura modular de NestJS
+- **DTOs**: Validación de entrada y salida
+- **Guards**: Protección de endpoints
+- **Decoradores**: Metadata para roles y validaciones
+- **Services**: Lógica de negocio separada
+- **Controllers**: Manejo de rutas HTTP
 
+## 📊 **Modelo de Base de Datos**
+
+```prisma
+model User {
+  id          String       @id @default(cuid())
+  email       String       @unique
+  password    String
+  name        String
+  role        Role         @default(USER)
+  tournaments Tournament[]
+}
+
+model Tournament {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  maxTeams    Int
+  status      TournamentStatus @default(UPCOMING)
+  organizer   User             @relation(fields: [organizerId], references: [id])
+  teams       Team[]
+  matches     Match[]
+}
+
+model Team {
+  id          String @id @default(cuid())
+  name        String
+  description String?
+  tournament  Tournament @relation(fields: [tournamentId], references: [id])
+  players     Player[]
+  homeMatches Match[] @relation("HomeTeam")
+  awayMatches Match[] @relation("AwayTeam")
+}
+
+model Player {
+  id       String  @id @default(cuid())
+  name     String
+  position String?
+  number   Int?
+  team     Team    @relation(fields: [teamId], references: [id])
+}
+
+model Match {
+  id         String      @id @default(cuid())
+  matchDate  DateTime
+  homeScore  Int?
+  awayScore  Int?
+  status     MatchStatus @default(SCHEDULED)
+  tournament Tournament  @relation(fields: [tournamentId], references: [id])
+  homeTeam   Team        @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam   Team        @relation("AwayTeam", fields: [awayTeamId], references: [id])
+}
+```
+
+## 🔐 **Sistema de Seguridad**
+
+### **Autenticación:**
+- JWT tokens con expiración configurable
+- Contraseñas encriptadas con bcrypt (salt rounds: 10)
+- Estrategia Passport para validación de tokens
+
+### **Autorización:**
+- Sistema de roles: USER, ADMIN
+- Guards para protección de endpoints
+- Decorador @Roles para especificar permisos requeridos
+
+### **Endpoints Protegidos:**
+```typescript
+// Público
+POST /auth/login
+POST /auth/register
+POST /users
+
+// Autenticado (JWT requerido)
+GET /auth/profile
+GET /users, /tournaments, /teams, /players, /matches
+
+// Solo ADMIN
+POST /tournaments, /teams
+PATCH /tournaments, /teams
+DELETE /tournaments, /teams, /users
+```
+
+## 🧪 **Ejemplos de Uso**
+
+### **1. Autenticación:**
 ```bash
-cd backend
-npm install
-npm run start:dev
+# Registro
+curl -X POST http://localhost:3000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"admin123","name":"Admin User","role":"ADMIN"}'
+
+# Login
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"admin123"}'
+```
+
+### **2. Gestión de Torneos:**
+```bash
+# Crear torneo (requiere token ADMIN)
+curl -X POST http://localhost:3000/tournaments \
+  -H "Authorization: Bearer [JWT_TOKEN]" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Copa 2024","startDate":"2024-06-01","endDate":"2024-06-30","maxTeams":16}'
+```
+
+### **3. Gestión de Equipos:**
+```bash
+# Crear equipo (requiere token ADMIN)
+curl -X POST http://localhost:3000/teams \
+  -H "Authorization: Bearer [JWT_TOKEN]" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Real Madrid","tournamentId":"tournament_id_123"}'
+```
+
+## 🚀 **Instalación y Configuración**
+
+### **Prerrequisitos:**
+- Node.js 18+
+- Docker y Docker Compose
+- Git
+
+### **Pasos de Instalación:**
+
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/fabianbele2605/PracticaRutaAvanzada_NetsJS.git
+   cd PracticaRutaAvanzada_NetsJS
+   ```
+
+2. **Configurar variables de entorno:**
+   ```bash
+   cd backend
+   cp .env.example .env
+   # Editar .env con tus configuraciones
+   ```
+
+3. **Levantar la base de datos:**
+   ```bash
+   docker-compose up -d postgres
+   ```
+
+4. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
+
+5. **Ejecutar migraciones:**
+   ```bash
+   npx prisma migrate dev
+   npx prisma generate
+   ```
+
+6. **Iniciar el servidor:**
+   ```bash
+   npm run start:dev
+   ```
+
+## 📁 **Estructura del Proyecto**
+
+```
+backend/
+├── src/
+│   ├── auth/           # Módulo de autenticación
+│   ├── users/          # Módulo de usuarios
+│   ├── tournaments/    # Módulo de torneos
+│   ├── teams/          # Módulo de equipos
+│   ├── players/        # Módulo de jugadores
+│   ├── matches/        # Módulo de partidos
+│   ├── prisma/         # Servicio de Prisma
+│   ├── app.module.ts   # Módulo principal
+│   └── main.ts         # Punto de entrada
+├── prisma/
+│   ├── schema.prisma   # Esquema de base de datos
+│   └── migrations/     # Migraciones
+├── test/               # Tests e2e
+├── package.json
+└── docker-compose.yml
+```
+
+## ✅ **Estado del Desarrollo**
+
+- [x] **Módulo Users**: CRUD completo con roles
+- [x] **Módulo Auth**: JWT + Guards + Decoradores
+- [x] **Módulo Tournaments**: Gestión completa de torneos
+- [x] **Módulo Teams**: Gestión de equipos con validaciones
+- [x] **Módulo Players**: Gestión de jugadores con filtros
+- [x] **Módulo Matches**: Gestión de partidos y resultados
+- [x] **Base de datos**: Esquema completo con relaciones
+- [x] **Seguridad**: Autenticación y autorización
+- [x] **Validaciones**: DTOs y reglas de negocio
+- [x] **Tests**: Unitarios para todos los módulos
+- [x] **Documentación**: READMEs específicos por módulo
+
+## 🔄 **Flujo de Desarrollo**
+
+### **Ramas del Proyecto:**
+- `main`: Rama principal (producción)
+- `develop`: Rama de desarrollo (integración)
+- `feature/users-module`: Módulo de usuarios
+- `feature/authentication`: Sistema de autenticación
+- `feature/tournaments-module`: Módulo de torneos
+- `feature/teams-module`: Módulo de equipos
+- `feature/players-module`: Módulo de jugadores
+- `feature/matches-module`: Módulo de partidos
+
+### **Metodología:**
+- **Git Flow**: Ramas feature para cada módulo
+- **Scaffolding**: Aprendizaje guiado paso a paso
+- **TDD**: Tests unitarios para cada funcionalidad
+- **Code Review**: Revisión de código antes de merge
+
+## 🚀 **Próximas Funcionalidades**
+
+1. **Módulo de Estadísticas**: Métricas y reportes de torneos
+2. **Notificaciones**: Sistema de notificaciones en tiempo real
+3. **API Documentation**: Swagger/OpenAPI completo
+4. **File Upload**: Subida de imágenes para equipos/jugadores
+5. **Dashboard**: Panel administrativo web
+6. **Mobile API**: Endpoints optimizados para móviles
+
+## 👨‍💻 **Desarrollado por**
+- **Estudiante**: Fabián Beleño
+- **Institución**: Riwi
+- **Programa**: Ruta Avanzada NestJS y TypeScript
+- **Metodología**: Scaffolding (Aprendizaje guiado)
+
+---
+**Nota**: Este proyecto demuestra el dominio completo de NestJS, TypeScript, Prisma y patrones de desarrollo backend modernos.
