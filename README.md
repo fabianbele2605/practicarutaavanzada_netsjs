@@ -1,163 +1,307 @@
 # PracticaRutaAvanzada_NetsJS
 practica sobre los aprendido de la ruta NestJS y typeScript Riwi
 
+# Setup Environment - Feature Implementation
 
-# Plataforma de Gestión de Torneos Deportivos con NestJS y TypeScript
+## 📋 **Resumen de la Rama `feature/setup-environment`**
 
-## Introducción
+Esta rama establece la configuración inicial completa del proyecto, incluyendo la estructura base de NestJS, configuración de Prisma ORM, Docker para PostgreSQL, variables de entorno y todas las herramientas de desarrollo necesarias.
 
-Este proyecto es una plataforma para gestionar torneos deportivos, donde se pueden registrar torneos, equipos, jugadores, partidos y resultados. Se basa en NestJS, TypeScript y un ORM (Prisma o TypeORM) para aprender buenas prácticas profesionales en desarrollo backend.
+## 🚀 **Configuraciones Implementadas**
+
+### **1. Proyecto NestJS Base**
+- **Inicialización**: Proyecto NestJS con TypeScript
+- **Estructura**: Arquitectura modular estándar
+- **CLI**: Configuración de NestJS CLI
+- **Scripts**: Scripts de desarrollo y producción
+
+### **2. Base de Datos y ORM**
+- **Prisma ORM**: Configuración completa con PostgreSQL
+- **Schema**: Definición inicial del esquema de base de datos
+- **Migraciones**: Sistema de migraciones configurado
+- **Cliente**: Generación automática del cliente Prisma
+
+### **3. Containerización con Docker**
+- **Docker Compose**: Configuración para PostgreSQL
+- **Dockerfile**: Imagen del backend (opcional)
+- **Networking**: Red interna para comunicación
+- **Volúmenes**: Persistencia de datos de PostgreSQL
+
+### **4. Variables de Entorno**
+- **Configuración**: Setup de ConfigModule de NestJS
+- **Variables**: DATABASE_URL, JWT_SECRET, PORT, NODE_ENV
+- **Seguridad**: Archivo .env para configuraciones sensibles
+- **Validación**: Carga global de variables de entorno
+
+### **5. Herramientas de Desarrollo**
+- **ESLint**: Linting de código TypeScript
+- **Prettier**: Formateo automático de código
+- **Husky**: Git hooks para calidad de código
+- **lint-staged**: Linting en archivos staged
+
+## 🛠️ **Archivos Creados/Configurados**
+
+### **Configuración del Proyecto:**
+```
+├── backend/
+│   ├── src/
+│   │   ├── app.controller.ts       ✅ Controller base
+│   │   ├── app.service.ts          ✅ Service base
+│   │   ├── app.module.ts           ✅ Módulo principal
+│   │   └── main.ts                 ✅ Punto de entrada
+│   ├── prisma/
+│   │   └── schema.prisma           ✅ Esquema de base de datos
+│   ├── .env                        ✅ Variables de entorno
+│   ├── .env.example               ✅ Plantilla de variables
+│   ├── package.json               ✅ Dependencias y scripts
+│   ├── tsconfig.json              ✅ Configuración TypeScript
+│   ├── nest-cli.json              ✅ Configuración NestJS CLI
+│   ├── .eslintrc.js               ✅ Configuración ESLint
+│   ├── .prettierrc                ✅ Configuración Prettier
+│   └── dockerfile                 ✅ Imagen Docker (opcional)
+├── docker-compose.yml             ✅ Servicios Docker
+└── .gitignore                     ✅ Archivos ignorados
+```
+
+## 🔧 **Dependencias Configuradas**
+
+### **Dependencias Principales:**
+```json
+{
+  "@nestjs/core": "Framework principal",
+  "@nestjs/common": "Decoradores y utilidades",
+  "@nestjs/config": "Gestión de configuración",
+  "prisma": "ORM y CLI",
+  "@prisma/client": "Cliente de base de datos",
+  "reflect-metadata": "Metadata para decoradores",
+  "rxjs": "Programación reactiva"
+}
+```
+
+### **Dependencias de Desarrollo:**
+```json
+{
+  "@nestjs/cli": "CLI de NestJS",
+  "@nestjs/testing": "Utilidades de testing",
+  "typescript": "Compilador TypeScript",
+  "eslint": "Linter de código",
+  "prettier": "Formateador de código",
+  "husky": "Git hooks",
+  "lint-staged": "Linting en staged files"
+}
+```
+
+## 🐳 **Configuración Docker**
+
+### **docker-compose.yml:**
+```yaml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    container_name: tournament_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: tournament_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+```
+
+### **Comandos Docker:**
+```bash
+# Levantar PostgreSQL
+docker-compose up -d postgres
+
+# Ver logs
+docker-compose logs postgres
+
+# Detener servicios
+docker-compose down
+```
+
+## 📊 **Esquema Inicial de Base de Datos**
+
+### **Configuración Prisma:**
+```prisma
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelos base para el sistema de torneos
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+```
+
+## ⚙️ **Variables de Entorno**
+
+### **Archivo .env:**
+```env
+# Database
+DATABASE_URL="postgresql://postgres:password@localhost:5432/tournament_db"
+
+# JWT
+JWT_SECRET="your-super-secret-jwt-key"
+JWT_EXPIRES_IN="7d"
+
+# App
+PORT=3000
+NODE_ENV="development"
+```
+
+### **ConfigModule Setup:**
+```typescript
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+## 🧪 **Scripts de Desarrollo**
+
+### **package.json scripts:**
+```json
+{
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
+  }
+}
+```
+
+## 🔍 **Herramientas de Calidad**
+
+### **ESLint Configuration:**
+```javascript
+module.exports = {
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: 'tsconfig.json',
+    tsconfigRootDir: __dirname,
+    sourceType: 'module',
+  },
+  plugins: ['@typescript-eslint/eslint-plugin'],
+  extends: [
+    '@nestjs',
+  ],
+  root: true,
+  env: {
+    node: true,
+    jest: true,
+  },
+};
+```
+
+### **Prettier Configuration:**
+```json
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "tabWidth": 2,
+  "semi": true,
+  "printWidth": 80
+}
+```
+
+## ✅ **Estado de Configuración**
+
+- [x] **Proyecto NestJS**: Inicializado con TypeScript
+- [x] **Prisma ORM**: Configurado con PostgreSQL
+- [x] **Docker**: PostgreSQL containerizado
+- [x] **Variables de entorno**: ConfigModule configurado
+- [x] **ESLint**: Linting de código configurado
+- [x] **Prettier**: Formateo automático configurado
+- [x] **Husky**: Git hooks configurados
+- [x] **Scripts**: Comandos de desarrollo listos
+- [x] **Estructura**: Arquitectura base establecida
+
+## 🚀 **Comandos de Inicio Rápido**
+
+### **Configuración Inicial:**
+```bash
+# 1. Instalar dependencias
+npm install
+
+# 2. Configurar variables de entorno
+cp .env.example .env
+# Editar .env con tus configuraciones
+
+# 3. Levantar base de datos
+docker-compose up -d postgres
+
+# 4. Ejecutar migraciones
+npx prisma migrate dev
+
+# 5. Generar cliente Prisma
+npx prisma generate
+
+# 6. Iniciar servidor de desarrollo
+npm run start:dev
+```
+
+### **Verificación:**
+```bash
+# Verificar que el servidor esté corriendo
+curl http://localhost:3000
+
+# Verificar base de datos
+npx prisma studio
+```
+
+## 🔄 **Flujo de Desarrollo Establecido**
+
+### **Estructura de Ramas:**
+- `main`: Producción
+- `develop`: Integración
+- `feature/*`: Nuevas funcionalidades
+
+### **Calidad de Código:**
+- Pre-commit hooks con Husky
+- Linting automático con ESLint
+- Formateo con Prettier
+- Tests unitarios con Jest
+
+## 👨💻 **Desarrollado por**
+- **Rama**: `feature/setup-environment`
+- **Propósito**: Configuración inicial del proyecto
+- **Tecnologías**: NestJS + Prisma + Docker + PostgreSQL
 
 ---
-
-## Tabla de Contenidos
-
-- [Fase 1: Preparación y Configuración](#fase-1-preparación-y-configuración-del-entorno)
-- [Fase 2: Autenticación y Usuarios](#fase-2-autenticación-y-usuarios)
-- [Fase 3: Entidades Básicas (Torneos, Equipos y Jugadores)](#fase-3-entidades-básicas-torneos-equipos-y-jugadores)
-- [Fase 4: Partidos y Resultados](#fase-4-partidos-y-resultados)
-- [Fase 5: WebSockets y Tiempo Real (Opcional)](#fase-5-websockets-y-tiempo-real-opcional)
-- [Fase 6: Reportes y Exportación](#fase-6-reportes-y-exportación)
-- [Fase 7: Testing, CI/CD y Deployment](#fase-7-testing-cicd-y-deployment)
-- [Roadmap Resumido](#roadmap-resumido)
-- [Próximos pasos](#próximos-pasos)
-
----
-
-## Fase 1: Preparación y Configuración del Entorno
-
-### Objetivo
-Establecer la base del proyecto con buenas prácticas, entorno profesional y herramientas esenciales.
-
-### Tareas
-- Inicializar proyecto NestJS con TypeScript.
-- Configurar ESLint, Prettier, Husky y lint-staged.
-- Configurar variables de entorno con `.env` y `ConfigModule`.
-- Elegir y configurar ORM (Prisma recomendado o TypeORM).
-- Crear contenedores Docker para PostgreSQL y backend (opcional).
-
-### Aprender/Investigar
-- Estructura de proyectos NestJS.
-- Uso y configuración de Prisma o TypeORM.
-- Uso básico de Docker para servicios.
-- Herramientas de linting y formateo.
-
----
-
-## Fase 2: Autenticación y Usuarios
-
-### Objetivo
-Implementar un sistema seguro de usuarios con autenticación y roles.
-
-### Tareas
-- Crear módulo de usuarios con modelo `User`.
-- Crear módulo de autenticación con registro, login, JWT.
-- Implementar roles y guards para autorización.
-- Opcional: Refresh tokens para sesiones persistentes.
-
-### Aprender/Investigar
-- Passport.js en NestJS.
-- Estrategias JWT y refresh tokens.
-- Guards y Decoradores personalizados.
-- Validaciones con `class-validator`.
-
----
-
-## Fase 3: Entidades Básicas (Torneos, Equipos y Jugadores)
-
-### Objetivo
-Diseñar el núcleo del sistema y relaciones entre torneos, equipos y jugadores.
-
-### Tareas
-- Modelar entidades `Tournament`, `Team`, `Player` con relaciones.
-- Crear módulos para cada entidad con CRUD.
-- Proteger rutas con roles.
-
-### Aprender/Investigar
-- Relaciones 1:N y N:M en ORM.
-- DTOs para validaciones.
-- Decoradores NestJS para manejo de peticiones.
-
----
-
-## Fase 4: Partidos y Resultados
-
-### Objetivo
-Registrar partidos, ingresar resultados y calcular estadísticas.
-
-### Tareas
-- Crear entidad `Match` con relaciones a equipos y torneos.
-- Endpoints para CRUD de partidos y resultados.
-- Implementar lógica para cálculo de puntos y tabla de posiciones.
-
-### Aprender/Investigar
-- Separación de lógica de negocio y controladores.
-- Pipes y validaciones personalizadas.
-
----
-
-## Fase 5: WebSockets y Tiempo Real (Opcional)
-
-### Objetivo
-Actualizar resultados y notificaciones en tiempo real.
-
-### Tareas
-- Crear Gateway WebSocket para partidos.
-- Emitir eventos cuando cambian resultados.
-- Permitir suscripción a torneos o equipos.
-
-### Aprender/Investigar
-- WebSockets con NestJS (`@WebSocketGateway`).
-- Concepto de salas y eventos en tiempo real.
-
----
-
-## Fase 6: Reportes y Exportación
-
-### Objetivo
-Exportar estadísticas y reportes en PDF o Excel.
-
-### Tareas
-- Crear módulo de reportes con endpoints de exportación.
-- Usar librerías como `pdfkit` o `exceljs`.
-- Proteger acceso con autenticación.
-
-### Aprender/Investigar
-- Generación y manejo de archivos en backend.
-- Streams y descargas HTTP.
-
----
-
-## Fase 7: Testing, CI/CD y Deployment
-
-### Objetivo
-Garantizar calidad con pruebas y desplegar el proyecto.
-
-### Tareas
-- Escribir pruebas unitarias y e2e con Jest y Supertest.
-- Configurar pipeline CI/CD con GitHub Actions.
-- Dockerizar aplicación y desplegar en servicios como Render o Railway.
-
-### Aprender/Investigar
-- Uso avanzado de Jest y mocks.
-- Configuración de workflows CI/CD.
-- Dockerización de aplicaciones NestJS.
-
----
-
-## Roadmap Resumido
-
-
----
-
-## Próximos pasos
-
-- Diseñar la base de datos con entidades y relaciones.
-- Definir endpoints REST completos.
-- Planificar roadmap semanal para desarrollo.
-- Integrar frontend (opcional).
-
----
-
-¡Con este roadmap tendrás una guía clara para construir un backend profesional con NestJS y TypeScript! Si quieres, te puedo ayudar con cualquiera de los siguientes pasos.
-
+**Nota**: Esta configuración proporciona la base sólida para el desarrollo de todo el sistema de gestión de torneos.
