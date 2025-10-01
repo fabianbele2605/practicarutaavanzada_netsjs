@@ -24,6 +24,28 @@ Módulo completo de gestión de torneos con:
 - ✅ Mínimo 2 equipos por torneo
 - ✅ Estados válidos (UPCOMING, ACTIVE, FINISHED)
 
+### ✅ Players Module (feature/players-module)
+Módulo completo de gestión de jugadores con:
+
+- **Modelo y CRUD de jugadores**: Operaciones completas vinculadas a equipos
+- **Filtros avanzados**: Búsqueda por nombre, posición y equipo
+- **Paginación completa**: Con metadatos y límites configurables
+- **Validaciones robustas**: Campos requeridos y opcionales
+
+#### Endpoints:
+- `POST /players` - Crear jugador
+- `GET /players` - Listar jugadores con filtros y paginación
+- `GET /players/:id` - Obtener jugador específico
+- `PATCH /players/:id` - Actualizar jugador
+- `DELETE /players/:id` - Eliminar jugador
+
+#### Filtros disponibles:
+- ✅ Búsqueda por nombre (case-insensitive)
+- ✅ Filtro por posición del jugador
+- ✅ Filtro por equipo específico (teamId)
+- ✅ Paginación con page y limit (1-100)
+- ✅ Respuesta con metadatos (total, totalPages)
+
 ## 🛠️ Tecnologías
 
 - **Backend**: NestJS + TypeScript
