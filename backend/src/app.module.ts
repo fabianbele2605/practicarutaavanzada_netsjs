@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PrismaService } from './prisma/prisma.service';
 import { TournamentsModule } from './tournaments/tournaments.module';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TournamentsModule } from './tournaments/tournaments.module';
     UsersModule,
     AuthModule,
     TournamentsModule,
+    TeamsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
