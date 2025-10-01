@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { Prisma, Role } from 'generated/prisma';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClient, Role } from 'generated/prisma';
+import { PrismaService } from '../prisma/prisma.service';
 import { ConflictException } from '@nestjs/common';
 
 describe('UsersService', () => {
