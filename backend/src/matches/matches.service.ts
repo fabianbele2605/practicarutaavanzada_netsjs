@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { QueryMatchDto } from './dto/query-match.dto';
-import { Match } from '../../../generated/prisma';
+import { Match } from '../../generated/prisma';
 
 
 @Injectable()
