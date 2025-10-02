@@ -39,10 +39,19 @@ Gestión de jugadores de los equipos.
 - **Características**: Filtros por nombre, posición, equipo, paginación
 
 ### ✅ **Matches Module**
-Gestión de partidos entre equipos.
-- **Funcionalidades**: CRUD de partidos, gestión de resultados, estados de partidos
+Gestión completa de partidos entre equipos.
+- **Funcionalidades**: CRUD de partidos, gestión de resultados, estados de partidos, filtros avanzados
 - **Endpoints**: `/matches` (GET, POST, PATCH, DELETE)
-- **Validaciones**: Equipos del mismo torneo, no pueden jugar contra sí mismos
+- **Validaciones**: Equipos del mismo torneo, no pueden jugar contra sí mismos, fechas válidas
+- **Filtros**: Por torneo, equipos, fecha, estado del partido
+- **Estados**: SCHEDULED, LIVE, FINISHED, CANCELLED
+
+### ✅ **WebSockets Module**
+Sistema de comunicación en tiempo real.
+- **Funcionalidades**: Notificaciones en tiempo real, actualizaciones de partidos en vivo
+- **Tecnología**: Socket.IO integrado con NestJS
+- **Características**: Manejo de conexiones, mensajes bidireccionales, CORS configurado
+- **Gateway**: EventsGateway para manejo de eventos WebSocket
 
 ## 🏗️ **Arquitectura del Sistema**
 
@@ -51,6 +60,7 @@ Gestión de partidos entre equipos.
 - **Base de datos**: PostgreSQL + Prisma ORM
 - **Autenticación**: JWT + Passport
 - **Validación**: class-validator + class-transformer
+- **WebSockets**: Socket.IO para tiempo real
 - **Testing**: Jest
 - **Containerización**: Docker
 
@@ -141,9 +151,9 @@ GET /auth/profile
 GET /users, /tournaments, /teams, /players, /matches
 
 // Solo ADMIN
-POST /tournaments, /teams
-PATCH /tournaments, /teams
-DELETE /tournaments, /teams, /users
+POST /tournaments, /teams, /matches
+PATCH /tournaments, /teams, /matches
+DELETE /tournaments, /teams, /matches, /users
 ```
 
 ## 🧪 **Ejemplos de Uso**
@@ -177,6 +187,29 @@ curl -X POST http://localhost:3000/teams \
   -H "Authorization: Bearer [JWT_TOKEN]" \
   -H "Content-Type: application/json" \
   -d '{"name":"Real Madrid","tournamentId":"tournament_id_123"}'
+```
+
+### **4. Gestión de Partidos:**
+```bash
+# Crear partido (requiere token ADMIN)
+curl -X POST http://localhost:3000/matches \
+  -H "Authorization: Bearer [JWT_TOKEN]" \
+  -H "Content-Type: application/json" \
+  -d '{"matchDate":"2025-12-15T20:00:00Z","tournamentId":"tournament_id","homeTeamId":"team1_id","awayTeamId":"team2_id"}'
+
+# Listar partidos con filtros
+curl "http://localhost:3000/matches?tournamentId=tournament_id&status=SCHEDULED" \
+  -H "Authorization: Bearer [JWT_TOKEN]"
+```
+
+### **5. WebSockets:**
+```javascript
+// Conexión desde cliente
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:3000');
+socket.on('connect', () => console.log('Connected'));
+socket.emit('message', 'Hello from client');
 ```
 
 ## 🚀 **Instalación y Configuración**
@@ -233,6 +266,7 @@ backend/
 │   ├── teams/          # Módulo de equipos
 │   ├── players/        # Módulo de jugadores
 │   ├── matches/        # Módulo de partidos
+│   ├── websockets/     # Módulo de WebSockets
 │   ├── prisma/         # Servicio de Prisma
 │   ├── app.module.ts   # Módulo principal
 │   └── main.ts         # Punto de entrada
@@ -251,11 +285,13 @@ backend/
 - [x] **Módulo Tournaments**: Gestión completa de torneos
 - [x] **Módulo Teams**: Gestión de equipos con validaciones
 - [x] **Módulo Players**: Gestión de jugadores con filtros
-- [x] **Módulo Matches**: Gestión de partidos y resultados
+- [x] **Módulo Matches**: Gestión completa de partidos con validaciones y filtros
+- [x] **Módulo WebSockets**: Comunicación en tiempo real con Socket.IO
 - [x] **Base de datos**: Esquema completo con relaciones
 - [x] **Seguridad**: Autenticación y autorización
 - [x] **Validaciones**: DTOs y reglas de negocio
 - [x] **Tests**: Unitarios para todos los módulos
+- [x] **Testing API**: Colección Postman completa
 - [x] **Documentación**: READMEs específicos por módulo
 
 ## 🔄 **Flujo de Desarrollo**
@@ -269,6 +305,8 @@ backend/
 - `feature/teams-module`: Módulo de equipos
 - `feature/players-module`: Módulo de jugadores
 - `feature/matches-module`: Módulo de partidos
+- `feature/realtime-websockets`: Sistema de WebSockets
+- `feature/postman-collection`: Colección de Postman para testing
 
 ### **Metodología:**
 - **Git Flow**: Ramas feature para cada módulo
@@ -278,12 +316,13 @@ backend/
 
 ## 🚀 **Próximas Funcionalidades**
 
-1. **Módulo de Estadísticas**: Métricas y reportes de torneos
-2. **Notificaciones**: Sistema de notificaciones en tiempo real
+1. **Eventos WebSocket**: Notificaciones específicas para torneos y partidos
+2. **Módulo de Estadísticas**: Métricas y reportes de torneos
 3. **API Documentation**: Swagger/OpenAPI completo
-4. **File Upload**: Subida de imágenes para equipos/jugadores
-5. **Dashboard**: Panel administrativo web
-6. **Mobile API**: Endpoints optimizados para móviles
+4. **Autenticación WebSocket**: JWT para conexiones WebSocket
+5. **File Upload**: Subida de imágenes para equipos/jugadores
+6. **Dashboard**: Panel administrativo web
+7. **Mobile API**: Endpoints optimizados para móviles
 
 ## 👨‍💻 **Desarrollado por**
 - **Estudiante**: Fabián Beleño
