@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { QueryMatchDto } from './dto/query-match.dto';
-import { Match } from '../../../generated/prisma';
+import { Match } from '@prisma/client';
 
 
 @Injectable()
@@ -124,6 +124,15 @@ export class MatchesService {
 
       if (awayTeamId && !awayTeam) {
         throw new NotFoundException('Away team not found');
+      }
+
+      // Validar que los equipos pertenezcan al torneo correcto
+      const targetTournamentId = tournamentId || existingMatch.tournamentId;
+      if (homeTeam && homeTeam.tournamentId !== targetTournamentId) {
+        throw new BadRequestException('Home team must belong to the specified tournament');
+      }
+      if (awayTeam && awayTeam.tournamentId !== targetTournamentId) {
+        throw new BadRequestException('Away team must belong to the specified tournament');
       }
     }
 

@@ -9,6 +9,7 @@ import { TournamentsModule } from './tournaments/tournaments.module';
 import { TeamsModule } from './teams/teams.module';
 import { PlayersModule } from './players/players.module';
 import { MatchesModule } from './matches/matches.module';
+import { WebsocketsModule } from './websockets/websockets.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MatchesModule } from './matches/matches.module';
     TeamsModule,
     PlayersModule,
     MatchesModule,
+    WebsocketsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

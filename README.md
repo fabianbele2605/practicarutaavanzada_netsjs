@@ -1,295 +1,122 @@
-# PracticaRutaAvanzada_NetsJS
-Práctica sobre lo aprendido de la ruta NestJS y TypeScript - Riwi
+# WebSockets Module
 
-## 🚀 **Sistema de Gestión de Torneos**
+## 📋 **Descripción**
+Módulo de WebSockets para comunicación en tiempo real en el sistema de gestión de torneos. Implementa Socket.IO para notificaciones y actualizaciones en vivo.
 
-Sistema completo de gestión de torneos deportivos desarrollado con **NestJS**, **TypeScript**, **Prisma** y **PostgreSQL**. Incluye autenticación JWT, autorización por roles y CRUD completo para todas las entidades.
+## ✅ **Funcionalidades Implementadas**
 
-## 📋 **Módulos Implementados**
+### **Gateway Básico:**
+- ✅ **EventsGateway**: Gateway principal para WebSocket connections
+- ✅ **Conexión/Desconexión**: Manejo de clientes que se conectan y desconectan
+- ✅ **Mensaje básico**: Handler para mensajes de prueba
+- ✅ **CORS configurado**: Permite conexiones desde cualquier origen
 
-### ✅ **Users Module**
-Gestión completa de usuarios del sistema.
-- **Funcionalidades**: CRUD de usuarios, encriptación de contraseñas, sistema de roles
-- **Roles**: USER, ADMIN
-- **Endpoints**: `/users` (GET, POST, PATCH, DELETE)
-- **Seguridad**: Contraseñas encriptadas con bcrypt
+### **Configuración:**
+- ✅ **Socket.IO integrado**: Configuración completa con NestJS
+- ✅ **WebsocketsModule**: Módulo NestJS para organización
+- ✅ **Logs de conexión**: Registro de conexiones y desconexiones
 
-### ✅ **Auth Module**
-Sistema de autenticación y autorización.
-- **Funcionalidades**: Login, registro, JWT tokens, guards de seguridad
-- **Endpoints**: `/auth/login`, `/auth/register`, `/auth/profile`
-- **Seguridad**: JWT Strategy, Guards (JwtAuthGuard, RolesGuard), decoradores @Roles
+## 🏗️ **Arquitectura**
 
-### ✅ **Tournaments Module**
-Gestión de torneos deportivos.
-- **Funcionalidades**: CRUD de torneos, validaciones de fechas, relación con organizadores
-- **Endpoints**: `/tournaments` (GET, POST, PATCH, DELETE)
-- **Validaciones**: Fechas válidas, límites de equipos, estados del torneo
-
-### ✅ **Teams Module**
-Gestión de equipos participantes.
-- **Funcionalidades**: CRUD de equipos, relación con torneos, validaciones de límites
-- **Endpoints**: `/teams` (GET, POST, PATCH, DELETE)
-- **Validaciones**: Límite máximo por torneo, nombres únicos por torneo
-
-### ✅ **Players Module**
-Gestión de jugadores de los equipos.
-- **Funcionalidades**: CRUD de jugadores, relación con equipos, filtros avanzados
-- **Endpoints**: `/players` (GET, POST, PATCH, DELETE)
-- **Características**: Filtros por nombre, posición, equipo, paginación
-
-### ✅ **Matches Module**
-Gestión de partidos entre equipos.
-- **Funcionalidades**: CRUD de partidos, gestión de resultados, estados de partidos
-- **Endpoints**: `/matches` (GET, POST, PATCH, DELETE)
-- **Validaciones**: Equipos del mismo torneo, no pueden jugar contra sí mismos
-
-## 🏗️ **Arquitectura del Sistema**
-
-### **Tecnologías Principales:**
-- **Backend**: NestJS + TypeScript
-- **Base de datos**: PostgreSQL + Prisma ORM
-- **Autenticación**: JWT + Passport
-- **Validación**: class-validator + class-transformer
-- **Testing**: Jest
-- **Containerización**: Docker
-
-### **Patrones Implementados:**
-- **Módulos**: Arquitectura modular de NestJS
-- **DTOs**: Validación de entrada y salida
-- **Guards**: Protección de endpoints
-- **Decoradores**: Metadata para roles y validaciones
-- **Services**: Lógica de negocio separada
-- **Controllers**: Manejo de rutas HTTP
-
-## 📊 **Modelo de Base de Datos**
-
-```prisma
-model User {
-  id          String       @id @default(cuid())
-  email       String       @unique
-  password    String
-  name        String
-  role        Role         @default(USER)
-  tournaments Tournament[]
-}
-
-model Tournament {
-  id          String           @id @default(cuid())
-  name        String
-  description String?
-  startDate   DateTime
-  endDate     DateTime
-  maxTeams    Int
-  status      TournamentStatus @default(UPCOMING)
-  organizer   User             @relation(fields: [organizerId], references: [id])
-  teams       Team[]
-  matches     Match[]
-}
-
-model Team {
-  id          String @id @default(cuid())
-  name        String
-  description String?
-  tournament  Tournament @relation(fields: [tournamentId], references: [id])
-  players     Player[]
-  homeMatches Match[] @relation("HomeTeam")
-  awayMatches Match[] @relation("AwayTeam")
-}
-
-model Player {
-  id       String  @id @default(cuid())
-  name     String
-  position String?
-  number   Int?
-  team     Team    @relation(fields: [teamId], references: [id])
-}
-
-model Match {
-  id         String      @id @default(cuid())
-  matchDate  DateTime
-  homeScore  Int?
-  awayScore  Int?
-  status     MatchStatus @default(SCHEDULED)
-  tournament Tournament  @relation(fields: [tournamentId], references: [id])
-  homeTeam   Team        @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  awayTeam   Team        @relation("AwayTeam", fields: [awayTeamId], references: [id])
-}
+### **Archivos Implementados:**
+```
+src/websockets/
+├── events.gateway.ts       # Gateway principal de WebSockets
+├── websockets.module.ts    # Módulo NestJS
+└── README.md              # Documentación
 ```
 
-## 🔐 **Sistema de Seguridad**
-
-### **Autenticación:**
-- JWT tokens con expiración configurable
-- Contraseñas encriptadas con bcrypt (salt rounds: 10)
-- Estrategia Passport para validación de tokens
-
-### **Autorización:**
-- Sistema de roles: USER, ADMIN
-- Guards para protección de endpoints
-- Decorador @Roles para especificar permisos requeridos
-
-### **Endpoints Protegidos:**
+### **EventsGateway:**
 ```typescript
-// Público
-POST /auth/login
-POST /auth/register
-POST /users
-
-// Autenticado (JWT requerido)
-GET /auth/profile
-GET /users, /tournaments, /teams, /players, /matches
-
-// Solo ADMIN
-POST /tournaments, /teams
-PATCH /tournaments, /teams
-DELETE /tournaments, /teams, /users
+@WebSocketGateway({
+    cors: {
+        origin: "*",
+    },
+})
+export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect
 ```
 
-## 🧪 **Ejemplos de Uso**
+## 🔧 **Configuración Técnica**
 
-### **1. Autenticación:**
-```bash
-# Registro
-curl -X POST http://localhost:3000/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"admin123","name":"Admin User","role":"ADMIN"}'
+### **Socket.IO Setup:**
+- ✅ **CORS habilitado**: Permite conexiones cross-origin
+- ✅ **Interfaces implementadas**: OnGatewayConnection, OnGatewayDisconnect
+- ✅ **Server instance**: @WebSocketServer para acceso al servidor
 
-# Login
-curl -X POST http://localhost:3000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"admin123"}'
+### **Handlers Implementados:**
+- ✅ `handleConnection()`: Maneja nuevas conexiones
+- ✅ `handleDisconnect()`: Maneja desconexiones
+- ✅ `@SubscribeMessage('message')`: Handler básico de mensajes
+
+## 📝 **Ejemplos de Uso**
+
+### **Conexión desde Cliente:**
+```javascript
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:3000');
+
+socket.on('connect', () => {
+  console.log('Connected to server');
+});
+
+socket.emit('message', 'Hello from client');
 ```
 
-### **2. Gestión de Torneos:**
-```bash
-# Crear torneo (requiere token ADMIN)
-curl -X POST http://localhost:3000/tournaments \
-  -H "Authorization: Bearer [JWT_TOKEN]" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Copa 2024","startDate":"2024-06-01","endDate":"2024-06-30","maxTeams":16}'
+### **Logs del Servidor:**
+```
+Client connected: socket_id_123
+Client disconnected: socket_id_123
 ```
 
-### **3. Gestión de Equipos:**
-```bash
-# Crear equipo (requiere token ADMIN)
-curl -X POST http://localhost:3000/teams \
-  -H "Authorization: Bearer [JWT_TOKEN]" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Real Madrid","tournamentId":"tournament_id_123"}'
-```
+## 🚀 **Características Técnicas**
 
-## 🚀 **Instalación y Configuración**
+### **Dependencias:**
+- ✅ `@nestjs/websockets`: Integración NestJS
+- ✅ `socket.io`: Biblioteca WebSocket
+- ✅ Decoradores: `@WebSocketGateway`, `@SubscribeMessage`
 
-### **Prerrequisitos:**
-- Node.js 18+
-- Docker y Docker Compose
-- Git
+### **Configuración:**
+- ✅ **Puerto**: Usa el mismo puerto del servidor HTTP
+- ✅ **CORS**: Configurado para desarrollo (`origin: "*"`)
+- ✅ **Logging**: Console logs para debugging
 
-### **Pasos de Instalación:**
+## ✅ **Estado del Módulo**
 
-1. **Clonar el repositorio:**
-   ```bash
-   git clone https://github.com/fabianbele2605/PracticaRutaAvanzada_NetsJS.git
-   cd PracticaRutaAvanzada_NetsJS
-   ```
+- [x] **Gateway**: EventsGateway implementado
+- [x] **Module**: WebsocketsModule configurado
+- [x] **Conexiones**: Manejo básico de conexión/desconexión
+- [x] **Mensajes**: Handler básico implementado
+- [x] **CORS**: Configurado para desarrollo
+- [x] **Documentación**: README completo
 
-2. **Configurar variables de entorno:**
-   ```bash
-   cd backend
-   cp .env.example .env
-   # Editar .env con tus configuraciones
-   ```
+## 🔄 **Próximos Pasos**
 
-3. **Levantar la base de datos:**
-   ```bash
-   docker-compose up -d postgres
-   ```
+1. **Eventos específicos**: Implementar eventos para torneos y partidos
+2. **Autenticación**: Integrar JWT para WebSockets
+3. **Rooms**: Crear salas por torneo/partido
+4. **Notificaciones**: Sistema de notificaciones en tiempo real
+5. **Testing**: Implementar tests para WebSockets
 
-4. **Instalar dependencias:**
-   ```bash
-   npm install
-   ```
+## 📋 **Eventos Planificados**
 
-5. **Ejecutar migraciones:**
-   ```bash
-   npx prisma migrate dev
-   npx prisma generate
-   ```
+### **Torneos:**
+- `tournament:created`
+- `tournament:updated`
+- `tournament:started`
 
-6. **Iniciar el servidor:**
-   ```bash
-   npm run start:dev
-   ```
+### **Partidos:**
+- `match:started`
+- `match:goal`
+- `match:finished`
+- `match:updated`
 
-## 📁 **Estructura del Proyecto**
-
-```
-backend/
-├── src/
-│   ├── auth/           # Módulo de autenticación
-│   ├── users/          # Módulo de usuarios
-│   ├── tournaments/    # Módulo de torneos
-│   ├── teams/          # Módulo de equipos
-│   ├── players/        # Módulo de jugadores
-│   ├── matches/        # Módulo de partidos
-│   ├── prisma/         # Servicio de Prisma
-│   ├── app.module.ts   # Módulo principal
-│   └── main.ts         # Punto de entrada
-├── prisma/
-│   ├── schema.prisma   # Esquema de base de datos
-│   └── migrations/     # Migraciones
-├── test/               # Tests e2e
-├── package.json
-└── docker-compose.yml
-```
-
-## ✅ **Estado del Desarrollo**
-
-- [x] **Módulo Users**: CRUD completo con roles
-- [x] **Módulo Auth**: JWT + Guards + Decoradores
-- [x] **Módulo Tournaments**: Gestión completa de torneos
-- [x] **Módulo Teams**: Gestión de equipos con validaciones
-- [x] **Módulo Players**: Gestión de jugadores con filtros
-- [x] **Módulo Matches**: Gestión de partidos y resultados
-- [x] **Base de datos**: Esquema completo con relaciones
-- [x] **Seguridad**: Autenticación y autorización
-- [x] **Validaciones**: DTOs y reglas de negocio
-- [x] **Tests**: Unitarios para todos los módulos
-- [x] **Documentación**: READMEs específicos por módulo
-
-## 🔄 **Flujo de Desarrollo**
-
-### **Ramas del Proyecto:**
-- `main`: Rama principal (producción)
-- `develop`: Rama de desarrollo (integración)
-- `feature/users-module`: Módulo de usuarios
-- `feature/authentication`: Sistema de autenticación
-- `feature/tournaments-module`: Módulo de torneos
-- `feature/teams-module`: Módulo de equipos
-- `feature/players-module`: Módulo de jugadores
-- `feature/matches-module`: Módulo de partidos
-
-### **Metodología:**
-- **Git Flow**: Ramas feature para cada módulo
-- **Scaffolding**: Aprendizaje guiado paso a paso
-- **TDD**: Tests unitarios para cada funcionalidad
-- **Code Review**: Revisión de código antes de merge
-
-## 🚀 **Próximas Funcionalidades**
-
-1. **Módulo de Estadísticas**: Métricas y reportes de torneos
-2. **Notificaciones**: Sistema de notificaciones en tiempo real
-3. **API Documentation**: Swagger/OpenAPI completo
-4. **File Upload**: Subida de imágenes para equipos/jugadores
-5. **Dashboard**: Panel administrativo web
-6. **Mobile API**: Endpoints optimizados para móviles
-
-## 👨‍💻 **Desarrollado por**
-- **Estudiante**: Fabián Beleño
-- **Institución**: Riwi
-- **Programa**: Ruta Avanzada NestJS y TypeScript
-- **Metodología**: Scaffolding (Aprendizaje guiado)
+### **Equipos:**
+- `team:joined`
+- `team:updated`
 
 ---
-**Nota**: Este proyecto demuestra el dominio completo de NestJS, TypeScript, Prisma y patrones de desarrollo backend modernos.
+
+**Módulo desarrollado por**: Fabián Beleño  
+**Fecha**: Octubre 2025  
+**Estado**: ✅ Básico implementado - En desarrollo
