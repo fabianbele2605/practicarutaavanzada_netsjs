@@ -53,6 +53,22 @@ Sistema de comunicación en tiempo real.
 - **Características**: Manejo de conexiones, mensajes bidireccionales, CORS configurado
 - **Gateway**: EventsGateway para manejo de eventos WebSocket
 
+### ✅ **CI/CD Pipeline**
+Sistema de integración y despliegue continuo.
+- **CI Pipeline**: Tests automatizados, linting, validaciones en cada push
+- **CD Pipeline**: Despliegue automático a producción desde main
+- **Security Pipeline**: Escaneo de vulnerabilidades y auditoría de dependencias
+- **Tecnología**: GitHub Actions con workflows automatizados
+- **Características**: Tests E2E, Docker builds, reportes de seguridad
+
+### ✅ **Testing Setup**
+Suite completa de testing automatizado.
+- **Unit Tests**: Tests unitarios para todos los servicios y controladores
+- **E2E Tests**: Tests de integración end-to-end
+- **Test Coverage**: Reportes de cobertura de código
+- **Tecnología**: Jest + Supertest para testing completo
+- **Características**: Mocks, fixtures, base de datos de testing
+
 ## 🏗️ **Arquitectura del Sistema**
 
 ### **Tecnologías Principales:**
@@ -61,8 +77,10 @@ Sistema de comunicación en tiempo real.
 - **Autenticación**: JWT + Passport
 - **Validación**: class-validator + class-transformer
 - **WebSockets**: Socket.IO para tiempo real
-- **Testing**: Jest
-- **Containerización**: Docker
+- **Testing**: Jest + Supertest + Coverage
+- **CI/CD**: GitHub Actions + Workflows automatizados
+- **Seguridad**: ESLint + Audit + Trivy Docker scan
+- **Containerización**: Docker + Docker Compose
 
 ### **Patrones Implementados:**
 - **Módulos**: Arquitectura modular de NestJS
@@ -212,6 +230,32 @@ socket.on('connect', () => console.log('Connected'));
 socket.emit('message', 'Hello from client');
 ```
 
+### **6. Testing:**
+```bash
+# Ejecutar tests unitarios
+npm run test
+
+# Ejecutar tests E2E
+npm run test:e2e
+
+# Generar reporte de cobertura
+npm run test:cov
+
+# Ejecutar linting
+npm run lint
+```
+
+### **7. CI/CD:**
+```bash
+# Los pipelines se ejecutan automáticamente:
+# - CI: En cada push a feature branches
+# - CD: En cada push a main
+# - Security: Semanalmente y en PRs
+
+# Build para producción
+docker-compose -f docker-compose.prod.yml up -d
+```
+
 ## 🚀 **Instalación y Configuración**
 
 ### **Prerrequisitos:**
@@ -267,6 +311,7 @@ backend/
 │   ├── players/        # Módulo de jugadores
 │   ├── matches/        # Módulo de partidos
 │   ├── websockets/     # Módulo de WebSockets
+│   ├── reporting/      # Módulo de reportes
 │   ├── prisma/         # Servicio de Prisma
 │   ├── app.module.ts   # Módulo principal
 │   └── main.ts         # Punto de entrada
@@ -274,8 +319,16 @@ backend/
 │   ├── schema.prisma   # Esquema de base de datos
 │   └── migrations/     # Migraciones
 ├── test/               # Tests e2e
+├── Dockerfile          # Docker para producción
 ├── package.json
-└── docker-compose.yml
+├── docker-compose.yml
+└── docker-compose.prod.yml
+.github/
+├── workflows/
+│   ├── ci.yml          # Pipeline de CI
+│   ├── cd.yml          # Pipeline de CD
+│   └── security.yml    # Pipeline de seguridad
+.env.prod               # Variables de producción
 ```
 
 ## ✅ **Estado del Desarrollo**
@@ -287,12 +340,17 @@ backend/
 - [x] **Módulo Players**: Gestión de jugadores con filtros
 - [x] **Módulo Matches**: Gestión completa de partidos con validaciones y filtros
 - [x] **Módulo WebSockets**: Comunicación en tiempo real con Socket.IO
+- [x] **Módulo Reporting**: Servicios de reportes y estadísticas
+- [x] **CI/CD Pipeline**: Integración y despliegue continuo con GitHub Actions
+- [x] **Testing Setup**: Suite completa de tests unitarios y E2E
+- [x] **Security Pipeline**: Escaneo de vulnerabilidades y auditoría
 - [x] **Base de datos**: Esquema completo con relaciones
 - [x] **Seguridad**: Autenticación y autorización
 - [x] **Validaciones**: DTOs y reglas de negocio
-- [x] **Tests**: Unitarios para todos los módulos
+- [x] **Tests**: Unitarios y E2E para todos los módulos
 - [x] **Testing API**: Colección Postman completa
 - [x] **Documentación**: READMEs específicos por módulo
+- [x] **Containerización**: Docker para desarrollo y producción
 
 ## 🔄 **Flujo de Desarrollo**
 
@@ -307,6 +365,8 @@ backend/
 - `feature/matches-module`: Módulo de partidos
 - `feature/realtime-websockets`: Sistema de WebSockets
 - `feature/postman-collection`: Colección de Postman para testing
+- `feature/ci-cd`: Pipeline de CI/CD con GitHub Actions
+- `feature/testing-setup`: Configuración de testing automatizado
 
 ### **Metodología:**
 - **Git Flow**: Ramas feature para cada módulo
