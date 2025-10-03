@@ -1,334 +1,271 @@
-# PracticaRutaAvanzada_NetsJS
-Práctica sobre lo aprendido de la ruta NestJS y TypeScript - Riwi
+# Feature CI/CD - Sistema de Integración y Despliegue Continuo
 
-## 🚀 **Sistema de Gestión de Torneos**
+## 🚀 **CI/CD Pipeline Completo**
 
-Sistema completo de gestión de torneos deportivos desarrollado con **NestJS**, **TypeScript**, **Prisma** y **PostgreSQL**. Incluye autenticación JWT, autorización por roles y CRUD completo para todas las entidades.
+Implementación completa de **Continuous Integration** y **Continuous Deployment** para el sistema de gestión de torneos, incluyendo automatización de tests, builds, security scanning y deployment.
 
-## 📋 **Módulos Implementados**
+## 📋 **Componentes Implementados**
 
-### ✅ **Users Module**
-Gestión completa de usuarios del sistema.
-- **Funcionalidades**: CRUD de usuarios, encriptación de contraseñas, sistema de roles
-- **Roles**: USER, ADMIN
-- **Endpoints**: `/users` (GET, POST, PATCH, DELETE)
-- **Seguridad**: Contraseñas encriptadas con bcrypt
+### ✅ **GitHub Actions Workflows**
 
-### ✅ **Auth Module**
-Sistema de autenticación y autorización.
-- **Funcionalidades**: Login, registro, JWT tokens, guards de seguridad
-- **Endpoints**: `/auth/login`, `/auth/register`, `/auth/profile`
-- **Seguridad**: JWT Strategy, Guards (JwtAuthGuard, RolesGuard), decoradores @Roles
+#### **1. CI Pipeline (`.github/workflows/ci.yml`)**
+- **Trigger**: Push/PR a main, develop, feature/*
+- **Servicios**: PostgreSQL automático para tests
+- **Steps**:
+  - Setup Node.js 18 con cache npm
+  - Instalación de dependencias
+  - Generación Prisma Client
+  - Migraciones de base de datos
+  - Linting con ESLint
+  - Tests unitarios (30+ tests)
+  - Tests E2E (integración completa)
 
-### ✅ **Tournaments Module**
-Gestión de torneos deportivos.
-- **Funcionalidades**: CRUD de torneos, validaciones de fechas, relación con organizadores
-- **Endpoints**: `/tournaments` (GET, POST, PATCH, DELETE)
-- **Validaciones**: Fechas válidas, límites de equipos, estados del torneo
+#### **2. CD Pipeline (`.github/workflows/cd.yml`)**
+- **Trigger**: Push a main (solo producción)
+- **Steps**:
+  - Build de aplicación para producción
+  - Generación Prisma Client
+  - Construcción imagen Docker optimizada
+  - Deploy automático (simulado)
+  - Notificaciones de deployment
 
-### ✅ **Teams Module**
-Gestión de equipos participantes.
-- **Funcionalidades**: CRUD de equipos, relación con torneos, validaciones de límites
-- **Endpoints**: `/teams` (GET, POST, PATCH, DELETE)
-- **Validaciones**: Límite máximo por torneo, nombres únicos por torneo
+#### **3. Security Pipeline (`.github/workflows/security.yml`)**
+- **Trigger**: Push/PR + Schedule semanal (Lunes 2 AM)
+- **Scans**:
+  - `npm audit` para vulnerabilidades de dependencias
+  - `audit-ci` para análisis avanzado
+  - ESLint security rules
+  - Trivy para escaneo de imágenes Docker
+  - Upload de reportes de seguridad
 
-### ✅ **Players Module**
-Gestión de jugadores de los equipos.
-- **Funcionalidades**: CRUD de jugadores, relación con equipos, filtros avanzados
-- **Endpoints**: `/players` (GET, POST, PATCH, DELETE)
-- **Características**: Filtros por nombre, posición, equipo, paginación
+### ✅ **Docker Optimizado**
 
-### ✅ **Matches Module**
-Gestión completa de partidos entre equipos.
-- **Funcionalidades**: CRUD de partidos, gestión de resultados, estados de partidos, filtros avanzados
-- **Endpoints**: `/matches` (GET, POST, PATCH, DELETE)
-- **Validaciones**: Equipos del mismo torneo, no pueden jugar contra sí mismos, fechas válidas
-- **Filtros**: Por torneo, equipos, fecha, estado del partido
-- **Estados**: SCHEDULED, LIVE, FINISHED, CANCELLED
+#### **Dockerfile Multi-stage (`backend/Dockerfile`)**
+```dockerfile
+# Stage 1: Builder
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+COPY prisma ./prisma/
+RUN npm ci
+COPY . .
+RUN npx prisma generate
+RUN npm run build
 
-### ✅ **WebSockets Module**
-Sistema de comunicación en tiempo real.
-- **Funcionalidades**: Notificaciones en tiempo real, actualizaciones de partidos en vivo
-- **Tecnología**: Socket.IO integrado con NestJS
-- **Características**: Manejo de conexiones, mensajes bidireccionales, CORS configurado
-- **Gateway**: EventsGateway para manejo de eventos WebSocket
-
-## 🏗️ **Arquitectura del Sistema**
-
-### **Tecnologías Principales:**
-- **Backend**: NestJS + TypeScript
-- **Base de datos**: PostgreSQL + Prisma ORM
-- **Autenticación**: JWT + Passport
-- **Validación**: class-validator + class-transformer
-- **WebSockets**: Socket.IO para tiempo real
-- **Testing**: Jest
-- **Containerización**: Docker
-
-### **Patrones Implementados:**
-- **Módulos**: Arquitectura modular de NestJS
-- **DTOs**: Validación de entrada y salida
-- **Guards**: Protección de endpoints
-- **Decoradores**: Metadata para roles y validaciones
-- **Services**: Lógica de negocio separada
-- **Controllers**: Manejo de rutas HTTP
-
-## 📊 **Modelo de Base de Datos**
-
-```prisma
-model User {
-  id          String       @id @default(cuid())
-  email       String       @unique
-  password    String
-  name        String
-  role        Role         @default(USER)
-  tournaments Tournament[]
-}
-
-model Tournament {
-  id          String           @id @default(cuid())
-  name        String
-  description String?
-  startDate   DateTime
-  endDate     DateTime
-  maxTeams    Int
-  status      TournamentStatus @default(UPCOMING)
-  organizer   User             @relation(fields: [organizerId], references: [id])
-  teams       Team[]
-  matches     Match[]
-}
-
-model Team {
-  id          String @id @default(cuid())
-  name        String
-  description String?
-  tournament  Tournament @relation(fields: [tournamentId], references: [id])
-  players     Player[]
-  homeMatches Match[] @relation("HomeTeam")
-  awayMatches Match[] @relation("AwayTeam")
-}
-
-model Player {
-  id       String  @id @default(cuid())
-  name     String
-  position String?
-  number   Int?
-  team     Team    @relation(fields: [teamId], references: [id])
-}
-
-model Match {
-  id         String      @id @default(cuid())
-  matchDate  DateTime
-  homeScore  Int?
-  awayScore  Int?
-  status     MatchStatus @default(SCHEDULED)
-  tournament Tournament  @relation(fields: [tournamentId], references: [id])
-  homeTeam   Team        @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  awayTeam   Team        @relation("AwayTeam", fields: [awayTeamId], references: [id])
-}
+# Stage 2: Runtime
+FROM node:18-alpine AS runtime
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nestjs -u 1001
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/generated ./generated
+COPY --from=builder /app/prisma ./prisma
+RUN chown -R nestjs:nodejs /app
+USER nestjs
+EXPOSE 3000
+CMD ["node", "dist/main"]
 ```
 
-## 🔐 **Sistema de Seguridad**
+#### **Docker Compose Producción (`docker-compose.prod.yml`)**
+```yaml
+version: '3.8'
 
-### **Autenticación:**
-- JWT tokens con expiración configurable
-- Contraseñas encriptadas con bcrypt (salt rounds: 10)
-- Estrategia Passport para validación de tokens
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: tournament_postgres_prod
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: tournament_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tournament_network
+    restart: unless-stopped
 
-### **Autorización:**
-- Sistema de roles: USER, ADMIN
-- Guards para protección de endpoints
-- Decorador @Roles para especificar permisos requeridos
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tournament_api_prod
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/tournament_db?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: 7d
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      - postgres
+    networks:
+      - tournament_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-### **Endpoints Protegidos:**
-```typescript
-// Público
-POST /auth/login
-POST /auth/register
-POST /users
+  nginx:
+    image: nginx:alpine
+    container_name: tournament_nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    networks:
+      - tournament_network
+    restart: unless-stopped
 
-// Autenticado (JWT requerido)
-GET /auth/profile
-GET /users, /tournaments, /teams, /players, /matches
+volumes:
+  postgres_data:
+    driver: local
 
-// Solo ADMIN
-POST /tournaments, /teams, /matches
-PATCH /tournaments, /teams, /matches
-DELETE /tournaments, /teams, /matches, /users
+networks:
+  tournament_network:
+    driver: bridge
 ```
 
-## 🧪 **Ejemplos de Uso**
-
-### **1. Autenticación:**
+#### **Variables de Producción (`.env.prod`)**
 ```bash
-# Registro
-curl -X POST http://localhost:3000/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"admin123","name":"Admin User","role":"ADMIN"}'
+# Database Production
+POSTGRES_PASSWORD=super_secure_production_password_2024
 
-# Login
-curl -X POST http://localhost:3000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"admin123"}'
+# JWT Production
+JWT_SECRET=ultra_secure_jwt_secret_key_for_production_environment_2024
+
+# Environment
+NODE_ENV=production
 ```
 
-### **2. Gestión de Torneos:**
+## 🔒 **Security Features**
+
+### **Dependency Scanning:**
+- **npm audit**: Vulnerabilidades en packages
+- **audit-ci**: Análisis avanzado con configuración personalizada
+- **Automated reports**: Artifacts de seguridad
+
+### **Docker Security:**
+- **Trivy scanning**: Escaneo de imágenes Docker
+- **Multi-stage builds**: Imágenes optimizadas y seguras
+- **Non-root user**: Usuario nestjs para mayor seguridad
+
+### **Code Analysis:**
+- **ESLint security rules**: Análisis estático de código
+- **Weekly scans**: Monitoreo continuo programado
+
+## 📊 **Quality Gates**
+
+### **Automated Validations:**
+- ✅ **Tests Required**: 100% tests deben pasar
+- ✅ **Linting**: Código debe cumplir estándares ESLint
+- ✅ **Security**: Sin vulnerabilidades críticas
+- ✅ **Build**: Aplicación debe compilar correctamente
+- ✅ **Health Checks**: Monitoreo de aplicación
+
+## 🚀 **Deployment Automático**
+
+### **CI/CD Flow:**
+```
+Push → CI Tests → Build → Security Scan → Deploy → Health Check
+```
+
+### **Desarrollo:**
 ```bash
-# Crear torneo (requiere token ADMIN)
-curl -X POST http://localhost:3000/tournaments \
-  -H "Authorization: Bearer [JWT_TOKEN]" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Copa 2024","startDate":"2024-06-01","endDate":"2024-06-30","maxTeams":16}'
+# Desarrollo local
+docker-compose up -d
+npm run start:dev
 ```
 
-### **3. Gestión de Equipos:**
+### **Producción:**
 ```bash
-# Crear equipo (requiere token ADMIN)
-curl -X POST http://localhost:3000/teams \
-  -H "Authorization: Bearer [JWT_TOKEN]" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Real Madrid","tournamentId":"tournament_id_123"}'
+# Producción con Docker Compose
+docker-compose -f docker-compose.prod.yml --env-file .env.prod up -d
 ```
 
-### **4. Gestión de Partidos:**
-```bash
-# Crear partido (requiere token ADMIN)
-curl -X POST http://localhost:3000/matches \
-  -H "Authorization: Bearer [JWT_TOKEN]" \
-  -H "Content-Type: application/json" \
-  -d '{"matchDate":"2025-12-15T20:00:00Z","tournamentId":"tournament_id","homeTeamId":"team1_id","awayTeamId":"team2_id"}'
+## 🏗️ **Arquitectura de Deployment**
 
-# Listar partidos con filtros
-curl "http://localhost:3000/matches?tournamentId=tournament_id&status=SCHEDULED" \
-  -H "Authorization: Bearer [JWT_TOKEN]"
-```
+### **Tecnologías Utilizadas:**
+- **CI/CD**: GitHub Actions
+- **Containerización**: Docker + Docker Compose
+- **Security**: Trivy, npm audit, ESLint
+- **Reverse Proxy**: Nginx
+- **Orchestration**: Docker Compose
+- **Health Monitoring**: Health checks automáticos
 
-### **5. WebSockets:**
-```javascript
-// Conexión desde cliente
-import { io } from 'socket.io-client';
+### **Optimizaciones Implementadas:**
+- **Multi-stage Docker builds**: Imágenes más pequeñas
+- **Cache optimization**: npm cache en workflows
+- **Security scanning**: Escaneos automáticos
+- **Health checks**: Monitoreo de aplicación
+- **Non-root containers**: Mayor seguridad
 
-const socket = io('http://localhost:3000');
-socket.on('connect', () => console.log('Connected'));
-socket.emit('message', 'Hello from client');
-```
-
-## 🚀 **Instalación y Configuración**
-
-### **Prerrequisitos:**
-- Node.js 18+
-- Docker y Docker Compose
-- Git
-
-### **Pasos de Instalación:**
-
-1. **Clonar el repositorio:**
-   ```bash
-   git clone https://github.com/fabianbele2605/PracticaRutaAvanzada_NetsJS.git
-   cd PracticaRutaAvanzada_NetsJS
-   ```
-
-2. **Configurar variables de entorno:**
-   ```bash
-   cd backend
-   cp .env.example .env
-   # Editar .env con tus configuraciones
-   ```
-
-3. **Levantar la base de datos:**
-   ```bash
-   docker-compose up -d postgres
-   ```
-
-4. **Instalar dependencias:**
-   ```bash
-   npm install
-   ```
-
-5. **Ejecutar migraciones:**
-   ```bash
-   npx prisma migrate dev
-   npx prisma generate
-   ```
-
-6. **Iniciar el servidor:**
-   ```bash
-   npm run start:dev
-   ```
-
-## 📁 **Estructura del Proyecto**
+## 📁 **Estructura de Archivos**
 
 ```
+.github/
+├── workflows/
+│   ├── ci.yml          # CI Pipeline
+│   ├── cd.yml          # CD Pipeline
+│   └── security.yml    # Security Scanning
 backend/
-├── src/
-│   ├── auth/           # Módulo de autenticación
-│   ├── users/          # Módulo de usuarios
-│   ├── tournaments/    # Módulo de torneos
-│   ├── teams/          # Módulo de equipos
-│   ├── players/        # Módulo de jugadores
-│   ├── matches/        # Módulo de partidos
-│   ├── websockets/     # Módulo de WebSockets
-│   ├── prisma/         # Servicio de Prisma
-│   ├── app.module.ts   # Módulo principal
-│   └── main.ts         # Punto de entrada
-├── prisma/
-│   ├── schema.prisma   # Esquema de base de datos
-│   └── migrations/     # Migraciones
-├── test/               # Tests e2e
-├── package.json
-└── docker-compose.yml
+├── Dockerfile          # Multi-stage optimizado
+└── ...
+docker-compose.prod.yml # Producción
+.env.prod              # Variables de producción
 ```
 
-## ✅ **Estado del Desarrollo**
+## ✅ **Funcionalidades Completadas**
 
-- [x] **Módulo Users**: CRUD completo con roles
-- [x] **Módulo Auth**: JWT + Guards + Decoradores
-- [x] **Módulo Tournaments**: Gestión completa de torneos
-- [x] **Módulo Teams**: Gestión de equipos con validaciones
-- [x] **Módulo Players**: Gestión de jugadores con filtros
-- [x] **Módulo Matches**: Gestión completa de partidos con validaciones y filtros
-- [x] **Módulo WebSockets**: Comunicación en tiempo real con Socket.IO
-- [x] **Base de datos**: Esquema completo con relaciones
-- [x] **Seguridad**: Autenticación y autorización
-- [x] **Validaciones**: DTOs y reglas de negocio
-- [x] **Tests**: Unitarios para todos los módulos
-- [x] **Testing API**: Colección Postman completa
-- [x] **Documentación**: READMEs específicos por módulo
+### **GitHub Actions:**
+- [x] **CI Pipeline**: Tests automáticos en cada push/PR
+- [x] **CD Pipeline**: Deploy automático a main
+- [x] **Security Pipeline**: Escaneos semanales programados
+- [x] **Quality Gates**: Validaciones automáticas
 
-## 🔄 **Flujo de Desarrollo**
+### **Docker:**
+- [x] **Multi-stage Dockerfile**: Optimizado para producción
+- [x] **Docker Compose**: Orquestación completa
+- [x] **Security**: Usuario no-root, escaneos Trivy
+- [x] **Health Checks**: Monitoreo automático
 
-### **Ramas del Proyecto:**
-- `main`: Rama principal (producción)
-- `develop`: Rama de desarrollo (integración)
-- `feature/users-module`: Módulo de usuarios
-- `feature/authentication`: Sistema de autenticación
-- `feature/tournaments-module`: Módulo de torneos
-- `feature/teams-module`: Módulo de equipos
-- `feature/players-module`: Módulo de jugadores
-- `feature/matches-module`: Módulo de partidos
-- `feature/realtime-websockets`: Sistema de WebSockets
-- `feature/postman-collection`: Colección de Postman para testing
+### **Security:**
+- [x] **Dependency Scanning**: npm audit + audit-ci
+- [x] **Docker Security**: Trivy scanning
+- [x] **Code Analysis**: ESLint security rules
+- [x] **Automated Reports**: Artifacts de seguridad
 
-### **Metodología:**
-- **Git Flow**: Ramas feature para cada módulo
-- **Scaffolding**: Aprendizaje guiado paso a paso
-- **TDD**: Tests unitarios para cada funcionalidad
-- **Code Review**: Revisión de código antes de merge
+## 🎯 **Beneficios Implementados**
 
-## 🚀 **Próximas Funcionalidades**
+### **Automatización:**
+- ✅ Tests automáticos en cada cambio
+- ✅ Deploy automático a producción
+- ✅ Security scanning continuo
+- ✅ Quality gates automáticos
 
-1. **Eventos WebSocket**: Notificaciones específicas para torneos y partidos
-2. **Módulo de Estadísticas**: Métricas y reportes de torneos
-3. **API Documentation**: Swagger/OpenAPI completo
-4. **Autenticación WebSocket**: JWT para conexiones WebSocket
-5. **File Upload**: Subida de imágenes para equipos/jugadores
-6. **Dashboard**: Panel administrativo web
-7. **Mobile API**: Endpoints optimizados para móviles
+### **Seguridad:**
+- ✅ Escaneo de vulnerabilidades
+- ✅ Imágenes Docker seguras
+- ✅ Análisis de código automático
+- ✅ Monitoreo continuo
 
-## 👨‍💻 **Desarrollado por**
+### **Optimización:**
+- ✅ Builds más rápidos con cache
+- ✅ Imágenes Docker optimizadas
+- ✅ Health checks automáticos
+- ✅ Deployment confiable
+
+## 👨💻 **Desarrollado por**
 - **Estudiante**: Fabián Beleño
 - **Institución**: Riwi
-- **Programa**: Ruta Avanzada NestJS y TypeScript
-- **Metodología**: Scaffolding (Aprendizaje guiado)
+- **Rama**: feature/ci-cd
+- **Metodología**: Scaffolding (Aprendizaje guiado paso a paso)
 
 ---
-**Nota**: Este proyecto demuestra el dominio completo de NestJS, TypeScript, Prisma y patrones de desarrollo backend modernos.
+**Nota**: Esta rama implementa un **pipeline CI/CD completo** con GitHub Actions, Docker optimizado, security scanning y deployment automático, siguiendo las mejores prácticas de DevOps.
