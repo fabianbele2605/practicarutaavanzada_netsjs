@@ -1,0 +1,6 @@
+email,password,name,role
+admin@tournament.com,admin123,Admin Principal,ADMIN
+organizer@tournament.com,org123,Organizador Copa,ADMIN
+user1@tournament.com,user123,Juan Pérez,USER
+user2@tournament.com,user123,María García,USER
+user3@tournament.com,user123,Carlos López,USER
