@@ -18,6 +18,7 @@ const tournaments_module_1 = require("./tournaments/tournaments.module");
 const teams_module_1 = require("./teams/teams.module");
 const players_module_1 = require("./players/players.module");
 const matches_module_1 = require("./matches/matches.module");
+const reporting_module_1 = require("./reporting/reporting.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -33,6 +34,7 @@ exports.AppModule = AppModule = __decorate([
             teams_module_1.TeamsModule,
             players_module_1.PlayersModule,
             matches_module_1.MatchesModule,
+            reporting_module_1.ReportingModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, prisma_service_1.PrismaService],

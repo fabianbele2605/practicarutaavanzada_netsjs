@@ -2,6 +2,7 @@ import { INestApplication } from "@nestjs/common"
 import { Test, TestingModule } from "@nestjs/testing";
 import request  from "supertest";
 import { AppModule } from "../src/app.module";
+import { PdfService } from "../src/reporting/services/pdf.service";
 
 
 describe('Reporting (e2e)', () => {
@@ -9,9 +10,16 @@ describe('Reporting (e2e)', () => {
     let jwtToken: string;
 
     beforeAll(async () => {
+        const mockPdfService = {
+            generateTournamentReport: jest.fn().mockResolvedValue(Buffer.from('mock pdf')),
+        };
+
         const moduleFixture = await Test.createTestingModule({
             imports: [AppModule],
-        }).compile();
+        })
+        .overrideProvider(PdfService)
+        .useValue(mockPdfService)
+        .compile();
 
         app = moduleFixture.createNestApplication();
         await app.init();

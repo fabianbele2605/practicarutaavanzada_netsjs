@@ -36,8 +36,8 @@ describe('TournamentsService', () => {
       const createTournamentDto = {
         name: 'Test Tournament',
         description: 'Test Description',
-        startDate: '2024-12-01T00:00:00.000Z',
-        endDate: '2024-12-31T00:00:00.000Z',
+        startDate: '2025-12-01T00:00:00.000Z',
+        endDate: '2025-12-31T00:00:00.000Z',
         maxTeams: 8,
         status: TournamentStatus.UPCOMING,
       };
@@ -77,8 +77,8 @@ describe('TournamentsService', () => {
     it('should throw BadRequestException if start date is after end date', async () => {
       const createTournamentDto = {
         name: 'Test Tournament',
-        startDate: '2024-12-31T00:00:00.000Z',
-        endDate: '2024-12-01T00:00:00.000Z',
+        startDate: '2025-12-31T00:00:00.000Z',
+        endDate: '2025-12-01T00:00:00.000Z',
         maxTeams: 8,
       };
 
