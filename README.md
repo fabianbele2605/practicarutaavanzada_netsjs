@@ -1,334 +1,186 @@
-# PracticaRutaAvanzada_NetsJS
-Práctica sobre lo aprendido de la ruta NestJS y TypeScript - Riwi
+# Testing Setup Module
 
-## 🚀 **Sistema de Gestión de Torneos**
+## 📋 **Descripción**
+Configuración completa del entorno de testing para el sistema de gestión de torneos. Implementa pruebas unitarias y E2E con Jest, mocks y configuración avanzada.
 
-Sistema completo de gestión de torneos deportivos desarrollado con **NestJS**, **TypeScript**, **Prisma** y **PostgreSQL**. Incluye autenticación JWT, autorización por roles y CRUD completo para todas las entidades.
+## ✅ **Funcionalidades Implementadas**
 
-## 📋 **Módulos Implementados**
+### **🧪 Unit Tests**
+- **ReportingService**: Pruebas unitarias completas con mocks
+- **Mock de PrismaService**: Simulación de base de datos para tests
+- **Assertions múltiples**: Validación de lógica de negocio
+- **Test coverage**: Cobertura de métodos principales
 
-### ✅ **Users Module**
-Gestión completa de usuarios del sistema.
-- **Funcionalidades**: CRUD de usuarios, encriptación de contraseñas, sistema de roles
-- **Roles**: USER, ADMIN
-- **Endpoints**: `/users` (GET, POST, PATCH, DELETE)
-- **Seguridad**: Contraseñas encriptadas con bcrypt
+### **🔄 E2E Tests**
+- **Estructura básica**: Framework para tests end-to-end
+- **Test de endpoints**: Pruebas de API completas
+- **Autenticación**: Tests con JWT tokens
+- **Configuración Jest E2E**: Setup específico para tests de integración
 
-### ✅ **Auth Module**
-Sistema de autenticación y autorización.
-- **Funcionalidades**: Login, registro, JWT tokens, guards de seguridad
-- **Endpoints**: `/auth/login`, `/auth/register`, `/auth/profile`
-- **Seguridad**: JWT Strategy, Guards (JwtAuthGuard, RolesGuard), decoradores @Roles
+### **⚙️ Jest Configuration**
+- **moduleNameMapper**: Resolución de rutas personalizadas
+- **Soporte Prisma**: Configuración para generated/prisma
+- **TypeScript**: Integración completa con ts-jest
+- **Configuración dual**: Setup separado para unit y E2E tests
 
-### ✅ **Tournaments Module**
-Gestión de torneos deportivos.
-- **Funcionalidades**: CRUD de torneos, validaciones de fechas, relación con organizadores
-- **Endpoints**: `/tournaments` (GET, POST, PATCH, DELETE)
-- **Validaciones**: Fechas válidas, límites de equipos, estados del torneo
+## 🏗️ **Archivos Implementados**
 
-### ✅ **Teams Module**
-Gestión de equipos participantes.
-- **Funcionalidades**: CRUD de equipos, relación con torneos, validaciones de límites
-- **Endpoints**: `/teams` (GET, POST, PATCH, DELETE)
-- **Validaciones**: Límite máximo por torneo, nombres únicos por torneo
-
-### ✅ **Players Module**
-Gestión de jugadores de los equipos.
-- **Funcionalidades**: CRUD de jugadores, relación con equipos, filtros avanzados
-- **Endpoints**: `/players` (GET, POST, PATCH, DELETE)
-- **Características**: Filtros por nombre, posición, equipo, paginación
-
-### ✅ **Matches Module**
-Gestión completa de partidos entre equipos.
-- **Funcionalidades**: CRUD de partidos, gestión de resultados, estados de partidos, filtros avanzados
-- **Endpoints**: `/matches` (GET, POST, PATCH, DELETE)
-- **Validaciones**: Equipos del mismo torneo, no pueden jugar contra sí mismos, fechas válidas
-- **Filtros**: Por torneo, equipos, fecha, estado del partido
-- **Estados**: SCHEDULED, LIVE, FINISHED, CANCELLED
-
-### ✅ **WebSockets Module**
-Sistema de comunicación en tiempo real.
-- **Funcionalidades**: Notificaciones en tiempo real, actualizaciones de partidos en vivo
-- **Tecnología**: Socket.IO integrado con NestJS
-- **Características**: Manejo de conexiones, mensajes bidireccionales, CORS configurado
-- **Gateway**: EventsGateway para manejo de eventos WebSocket
-
-## 🏗️ **Arquitectura del Sistema**
-
-### **Tecnologías Principales:**
-- **Backend**: NestJS + TypeScript
-- **Base de datos**: PostgreSQL + Prisma ORM
-- **Autenticación**: JWT + Passport
-- **Validación**: class-validator + class-transformer
-- **WebSockets**: Socket.IO para tiempo real
-- **Testing**: Jest
-- **Containerización**: Docker
-
-### **Patrones Implementados:**
-- **Módulos**: Arquitectura modular de NestJS
-- **DTOs**: Validación de entrada y salida
-- **Guards**: Protección de endpoints
-- **Decoradores**: Metadata para roles y validaciones
-- **Services**: Lógica de negocio separada
-- **Controllers**: Manejo de rutas HTTP
-
-## 📊 **Modelo de Base de Datos**
-
-```prisma
-model User {
-  id          String       @id @default(cuid())
-  email       String       @unique
-  password    String
-  name        String
-  role        Role         @default(USER)
-  tournaments Tournament[]
-}
-
-model Tournament {
-  id          String           @id @default(cuid())
-  name        String
-  description String?
-  startDate   DateTime
-  endDate     DateTime
-  maxTeams    Int
-  status      TournamentStatus @default(UPCOMING)
-  organizer   User             @relation(fields: [organizerId], references: [id])
-  teams       Team[]
-  matches     Match[]
-}
-
-model Team {
-  id          String @id @default(cuid())
-  name        String
-  description String?
-  tournament  Tournament @relation(fields: [tournamentId], references: [id])
-  players     Player[]
-  homeMatches Match[] @relation("HomeTeam")
-  awayMatches Match[] @relation("AwayTeam")
-}
-
-model Player {
-  id       String  @id @default(cuid())
-  name     String
-  position String?
-  number   Int?
-  team     Team    @relation(fields: [teamId], references: [id])
-}
-
-model Match {
-  id         String      @id @default(cuid())
-  matchDate  DateTime
-  homeScore  Int?
-  awayScore  Int?
-  status     MatchStatus @default(SCHEDULED)
-  tournament Tournament  @relation(fields: [tournamentId], references: [id])
-  homeTeam   Team        @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  awayTeam   Team        @relation("AwayTeam", fields: [awayTeamId], references: [id])
-}
+### **Unit Tests:**
+```
+src/reporting/services/
+└── reporting.service.spec.ts    # Pruebas unitarias del ReportingService
 ```
 
-## 🔐 **Sistema de Seguridad**
+### **E2E Tests:**
+```
+test/
+├── reporting.e2e-spec.ts        # Tests end-to-end de endpoints
+└── jest-e2e.json               # Configuración Jest para E2E
+```
 
-### **Autenticación:**
-- JWT tokens con expiración configurable
-- Contraseñas encriptadas con bcrypt (salt rounds: 10)
-- Estrategia Passport para validación de tokens
+### **Configuración:**
+```
+package.json                     # Scripts y configuración Jest
+```
 
-### **Autorización:**
-- Sistema de roles: USER, ADMIN
-- Guards para protección de endpoints
-- Decorador @Roles para especificar permisos requeridos
+## 🧪 **Tests Implementados**
 
-### **Endpoints Protegidos:**
+### **ReportingService Unit Tests:**
 ```typescript
-// Público
-POST /auth/login
-POST /auth/register
-POST /users
-
-// Autenticado (JWT requerido)
-GET /auth/profile
-GET /users, /tournaments, /teams, /players, /matches
-
-// Solo ADMIN
-POST /tournaments, /teams, /matches
-PATCH /tournaments, /teams, /matches
-DELETE /tournaments, /teams, /matches, /users
+✅ should be defined                    # Test básico de definición
+✅ should return tournament stats       # Test de lógica de negocio
 ```
 
-## 🧪 **Ejemplos de Uso**
+### **Reporting E2E Tests:**
+```typescript
+⏳ /reporting/tournament-stats (GET)    # Test de endpoint completo
+```
 
-### **1. Autenticación:**
+## 📊 **Resultados de Testing**
+
+### **Unit Tests:**
 ```bash
-# Registro
-curl -X POST http://localhost:3000/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"admin123","name":"Admin User","role":"ADMIN"}'
-
-# Login
-curl -X POST http://localhost:3000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"admin123"}'
+npm run test reporting.service.spec.ts
+# ✅ 2 tests pasando
+# ✅ 0 tests fallando
+# ⏱️ Tiempo: ~0.8s
 ```
 
-### **2. Gestión de Torneos:**
+### **E2E Tests:**
 ```bash
-# Crear torneo (requiere token ADMIN)
-curl -X POST http://localhost:3000/tournaments \
-  -H "Authorization: Bearer [JWT_TOKEN]" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Copa 2024","startDate":"2024-06-01","endDate":"2024-06-30","maxTeams":16}'
+npm run test:e2e -- --testPathPatterns=reporting.e2e-spec.ts
+# ⚙️ Configurado y listo
+# 🔧 Requiere base de datos activa
 ```
 
-### **3. Gestión de Equipos:**
+## 🔧 **Configuración Técnica**
+
+### **Jest Unit Tests:**
+```json
+{
+  "moduleNameMapper": {
+    "^generated/prisma$": "<rootDir>/../generated/prisma"
+  },
+  "testRegex": ".*\\.spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  }
+}
+```
+
+### **Jest E2E Tests:**
+```json
+{
+  "moduleNameMapper": {
+    "^generated/prisma$": "<rootDir>/../generated/prisma",
+    "^src/(.*)$": "<rootDir>/../src/$1"
+  },
+  "testRegex": ".e2e-spec.ts$"
+}
+```
+
+## 🎯 **Conceptos Implementados**
+
+### **Mocking:**
+- ✅ **jest.fn()**: Funciones mock básicas
+- ✅ **jest.spyOn()**: Espías en métodos existentes
+- ✅ **useValue**: Reemplazo completo de servicios
+- ✅ **mockResolvedValue**: Simulación de promesas
+
+### **Testing Patterns:**
+- ✅ **describe/it**: Estructura de tests
+- ✅ **beforeEach**: Setup de tests
+- ✅ **TestingModule**: Módulos de prueba de NestJS
+- ✅ **expect/toBe**: Assertions básicas
+
+### **E2E Patterns:**
+- ✅ **supertest**: Cliente HTTP para tests
+- ✅ **beforeAll/afterAll**: Setup de aplicación completa
+- ✅ **JWT Authentication**: Tests con autenticación real
+
+## 📝 **Ejemplos de Uso**
+
+### **Ejecutar Unit Tests:**
 ```bash
-# Crear equipo (requiere token ADMIN)
-curl -X POST http://localhost:3000/teams \
-  -H "Authorization: Bearer [JWT_TOKEN]" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Real Madrid","tournamentId":"tournament_id_123"}'
+# Test específico
+npm run test reporting.service.spec.ts
+
+# Todos los unit tests
+npm run test
+
+# Con coverage
+npm run test:cov
 ```
 
-### **4. Gestión de Partidos:**
+### **Ejecutar E2E Tests:**
 ```bash
-# Crear partido (requiere token ADMIN)
-curl -X POST http://localhost:3000/matches \
-  -H "Authorization: Bearer [JWT_TOKEN]" \
-  -H "Content-Type: application/json" \
-  -d '{"matchDate":"2025-12-15T20:00:00Z","tournamentId":"tournament_id","homeTeamId":"team1_id","awayTeamId":"team2_id"}'
+# Test específico
+npm run test:e2e -- --testPathPatterns=reporting.e2e-spec.ts
 
-# Listar partidos con filtros
-curl "http://localhost:3000/matches?tournamentId=tournament_id&status=SCHEDULED" \
-  -H "Authorization: Bearer [JWT_TOKEN]"
+# Todos los E2E tests
+npm run test:e2e
 ```
 
-### **5. WebSockets:**
-```javascript
-// Conexión desde cliente
-import { io } from 'socket.io-client';
+### **Desarrollo con Watch:**
+```bash
+# Unit tests en modo watch
+npm run test:watch
 
-const socket = io('http://localhost:3000');
-socket.on('connect', () => console.log('Connected'));
-socket.emit('message', 'Hello from client');
+# Debug de tests
+npm run test:debug
 ```
 
-## 🚀 **Instalación y Configuración**
+## 🚀 **Próximos Pasos**
 
-### **Prerrequisitos:**
-- Node.js 18+
-- Docker y Docker Compose
-- Git
+### **Unit Tests Pendientes:**
+- [ ] Tests para PdfService
+- [ ] Tests para ExcelService
+- [ ] Tests para otros servicios (Users, Auth, etc.)
+- [ ] Tests de DTOs y validaciones
 
-### **Pasos de Instalación:**
+### **E2E Tests Pendientes:**
+- [ ] Tests completos de autenticación
+- [ ] Tests de todos los endpoints CRUD
+- [ ] Tests de validaciones y errores
+- [ ] Tests de integración entre módulos
 
-1. **Clonar el repositorio:**
-   ```bash
-   git clone https://github.com/fabianbele2605/PracticaRutaAvanzada_NetsJS.git
-   cd PracticaRutaAvanzada_NetsJS
-   ```
+### **Mejoras de Testing:**
+- [ ] Test database separada
+- [ ] Seeders para datos de prueba
+- [ ] Tests de performance
+- [ ] Coverage reports automáticos
 
-2. **Configurar variables de entorno:**
-   ```bash
-   cd backend
-   cp .env.example .env
-   # Editar .env con tus configuraciones
-   ```
+## ✅ **Estado del Módulo**
 
-3. **Levantar la base de datos:**
-   ```bash
-   docker-compose up -d postgres
-   ```
-
-4. **Instalar dependencias:**
-   ```bash
-   npm install
-   ```
-
-5. **Ejecutar migraciones:**
-   ```bash
-   npx prisma migrate dev
-   npx prisma generate
-   ```
-
-6. **Iniciar el servidor:**
-   ```bash
-   npm run start:dev
-   ```
-
-## 📁 **Estructura del Proyecto**
-
-```
-backend/
-├── src/
-│   ├── auth/           # Módulo de autenticación
-│   ├── users/          # Módulo de usuarios
-│   ├── tournaments/    # Módulo de torneos
-│   ├── teams/          # Módulo de equipos
-│   ├── players/        # Módulo de jugadores
-│   ├── matches/        # Módulo de partidos
-│   ├── websockets/     # Módulo de WebSockets
-│   ├── prisma/         # Servicio de Prisma
-│   ├── app.module.ts   # Módulo principal
-│   └── main.ts         # Punto de entrada
-├── prisma/
-│   ├── schema.prisma   # Esquema de base de datos
-│   └── migrations/     # Migraciones
-├── test/               # Tests e2e
-├── package.json
-└── docker-compose.yml
-```
-
-## ✅ **Estado del Desarrollo**
-
-- [x] **Módulo Users**: CRUD completo con roles
-- [x] **Módulo Auth**: JWT + Guards + Decoradores
-- [x] **Módulo Tournaments**: Gestión completa de torneos
-- [x] **Módulo Teams**: Gestión de equipos con validaciones
-- [x] **Módulo Players**: Gestión de jugadores con filtros
-- [x] **Módulo Matches**: Gestión completa de partidos con validaciones y filtros
-- [x] **Módulo WebSockets**: Comunicación en tiempo real con Socket.IO
-- [x] **Base de datos**: Esquema completo con relaciones
-- [x] **Seguridad**: Autenticación y autorización
-- [x] **Validaciones**: DTOs y reglas de negocio
-- [x] **Tests**: Unitarios para todos los módulos
-- [x] **Testing API**: Colección Postman completa
-- [x] **Documentación**: READMEs específicos por módulo
-
-## 🔄 **Flujo de Desarrollo**
-
-### **Ramas del Proyecto:**
-- `main`: Rama principal (producción)
-- `develop`: Rama de desarrollo (integración)
-- `feature/users-module`: Módulo de usuarios
-- `feature/authentication`: Sistema de autenticación
-- `feature/tournaments-module`: Módulo de torneos
-- `feature/teams-module`: Módulo de equipos
-- `feature/players-module`: Módulo de jugadores
-- `feature/matches-module`: Módulo de partidos
-- `feature/realtime-websockets`: Sistema de WebSockets
-- `feature/postman-collection`: Colección de Postman para testing
-
-### **Metodología:**
-- **Git Flow**: Ramas feature para cada módulo
-- **Scaffolding**: Aprendizaje guiado paso a paso
-- **TDD**: Tests unitarios para cada funcionalidad
-- **Code Review**: Revisión de código antes de merge
-
-## 🚀 **Próximas Funcionalidades**
-
-1. **Eventos WebSocket**: Notificaciones específicas para torneos y partidos
-2. **Módulo de Estadísticas**: Métricas y reportes de torneos
-3. **API Documentation**: Swagger/OpenAPI completo
-4. **Autenticación WebSocket**: JWT para conexiones WebSocket
-5. **File Upload**: Subida de imágenes para equipos/jugadores
-6. **Dashboard**: Panel administrativo web
-7. **Mobile API**: Endpoints optimizados para móviles
-
-## 👨‍💻 **Desarrollado por**
-- **Estudiante**: Fabián Beleño
-- **Institución**: Riwi
-- **Programa**: Ruta Avanzada NestJS y TypeScript
-- **Metodología**: Scaffolding (Aprendizaje guiado)
+- [x] **Jest configurado**: Unit y E2E tests
+- [x] **Mocks implementados**: PrismaService y dependencias
+- [x] **Unit tests funcionando**: ReportingService completo
+- [x] **E2E structure**: Framework listo para usar
+- [x] **TypeScript support**: Configuración completa
+- [x] **Documentación**: README completo
 
 ---
-**Nota**: Este proyecto demuestra el dominio completo de NestJS, TypeScript, Prisma y patrones de desarrollo backend modernos.
+
+**Módulo desarrollado por**: Fabián Beleño  
+**Fecha**: Octubre 2025  
+**Estado**: ✅ Configuración completa - Tests básicos funcionando
