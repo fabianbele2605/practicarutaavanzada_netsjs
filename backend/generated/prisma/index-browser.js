@@ -139,7 +139,8 @@ exports.Prisma.TournamentScalarFieldEnum = {
   maxTeams: 'maxTeams',
   status: 'status',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  organizerId: 'organizerId'
 };
 
 exports.Prisma.TeamScalarFieldEnum = {
