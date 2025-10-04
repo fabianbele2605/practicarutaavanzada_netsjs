@@ -24,6 +24,16 @@ describe('Reporting (e2e)', () => {
         app = moduleFixture.createNestApplication();
         await app.init();
 
+        // Crear usuario de prueba
+        await request(app.getHttpServer())
+            .post('/auth/register')
+            .send({
+                email: 'fabian@test.com',
+                password: 'fabian123',
+                name: 'Fabian Test',
+                role: 'ADMIN'
+            });
+
         const loginResponse = await request(app.getHttpServer())
             .post('/auth/login')
             .send({
